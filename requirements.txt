@@ -1,0 +1,21 @@
+# Core framework
+Django>=5.0,<6.0
+
+# MySQL driver
+mysqlclient>=2.2.4
+
+# Environment variable management (.env)
+python-decouple>=3.8
+
+# Image handling (product/category/brand images)
+Pillow>=10.4.0
+
+# Catalog filtering (price, category, brand, rating, stock, attributes)
+django-filter>=24.2
+
+# HTTP client for the Khalti payment gateway API (Phase 9)
+requests>=2.32.0
+
+# Testing
+pytest>=8.3.0
+pytest-django>=4.9.0

@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA Market | Online Store</title>
+
+    <style>
+        :root {
+            --primary: #635bff;
+            --primary-dark: #4b44d6;
+            --dark: #171923;
+            --muted: #707789;
+            --background: #f6f7fb;
+            --border: #e7e9f0;
+            --success: #15803d;
+            --danger: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--background);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        .container {
+            width: min(1180px, 92%);
+            margin: 0 auto;
+        }
+
+        .announcement {
+            padding: 9px 15px;
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.97);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-inner {
+            min-height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            white-space: nowrap;
+        }
+
+        .logo span,
+        .footer-brand span {
+            color: var(--primary);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 8px;
+            width: min(390px, 42%);
+        }
+
+        .search-form input {
+            width: 100%;
+            min-width: 0;
+            padding: 11px 13px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            outline: none;
+        }
+
+        .search-form input:focus {
+            border-color: var(--primary);
+        }
+
+        .search-button,
+        .primary-button {
+            border: none;
+            border-radius: 9px;
+            padding: 11px 15px;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .search-button:hover,
+        .primary-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-link {
+            color: #42485a;
+            font-size: 13px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .header-link:hover {
+            color: var(--primary);
+        }
+
+        /* Track Order button */
+        .track-order-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 11px 14px;
+            border: 1px solid var(--primary);
+            border-radius: 9px;
+            background: var(--primary);
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            white-space: nowrap;
+            text-decoration: none;
+            transition: background 0.2s ease;
+        }
+
+        .track-order-link:hover {
+            background: var(--primary-dark);
+            color: white;
+        }
+
+        .hero {
+            padding: 48px 0 32px;
+        }
+
+        .hero-panel {
+            position: relative;
+            overflow: hidden;
+            padding: 52px;
+            border-radius: 24px;
+            background: linear-gradient(120deg, #ecebff, #f4f1ff 55%, #e4f5ff);
+        }
+
+        .hero-panel::after {
+            content: "✦";
+            position: absolute;
+            top: -45px;
+            right: 6%;
+            color: #635bff19;
+            font-size: 250px;
+            pointer-events: none;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            margin-bottom: 12px;
+            color: var(--primary-dark);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .hero h1 {
+            max-width: 620px;
+            margin-bottom: 16px;
+            font-size: clamp(35px, 5vw, 56px);
+            line-height: 1.1;
+            letter-spacing: -2px;
+        }
+
+        .hero p {
+            max-width: 510px;
+            margin-bottom: 24px;
+            color: #62677b;
+            font-size: 15px;
+        }
+
+        .hero-button {
+            display: inline-block;
+            padding: 13px 20px;
+            border-radius: 9px;
+            background: var(--dark);
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .benefits {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 0 0 35px;
+        }
+
+        .benefit {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+        }
+
+        .benefit-icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 11px;
+            background: #efedff;
+            font-size: 21px;
+        }
+
+        .benefit strong {
+            display: block;
+            font-size: 13px;
+        }
+
+        .benefit small {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .products-section {
+            padding: 20px 0 70px;
+            scroll-margin-top: 95px;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .section-heading h2 {
+            font-size: clamp(25px, 3vw, 34px);
+            letter-spacing: -1px;
+        }
+
+        .section-heading p,
+        .product-count {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .product-count {
+            white-space: nowrap;
+        }
+
+        .category-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-bottom: 25px;
+        }
+
+        .category-chip {
+            display: inline-block;
+            padding: 9px 15px;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            background: white;
+            color: #50576a;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .category-chip:hover,
+        .category-chip.active {
+            background: var(--dark);
+            border-color: var(--dark);
+            color: white;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            min-width: 0;
+            overflow: hidden;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px #17203310;
+        }
+
+        .product-art {
+            position: relative;
+            min-height: 195px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: linear-gradient(140deg, #f1efff, #f8f7ff);
+        }
+
+        .product-art::before {
+            content: "";
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #ffffff99;
+        }
+
+        .product-art .emoji {
+            position: relative;
+            z-index: 1;
+            font-size: 74px;
+            filter: drop-shadow(0 10px 10px #20204015);
+        }
+
+        .product-art img {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 195px;
+            padding: 16px;
+            object-fit: contain;
+        }
+
+        .product-tag {
+            position: absolute;
+            z-index: 3;
+            top: 12px;
+            left: 12px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            background: white;
+            color: var(--primary-dark);
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .wishlist-button {
+            position: absolute;
+            z-index: 4;
+            top: 10px;
+            right: 10px;
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border: none;
+            border-radius: 50%;
+            background: white;
+            color: #4b5060;
+            font-size: 19px;
+            cursor: pointer;
+        }
+
+        .wishlist-button.selected {
+            color: #e11d48;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-category {
+            margin-bottom: 5px;
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .product-name {
+            min-height: 45px;
+            margin-bottom: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .product-name a:hover {
+            color: var(--primary);
+        }
+
+        .product-description {
+            min-height: 38px;
+            margin-bottom: 12px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .product-bottom {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f1f5;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 900;
+            overflow-wrap: anywhere;
+        }
+
+        .stock-label {
+            margin-top: 4px;
+            color: var(--success);
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .stock-label.out-of-stock {
+            color: var(--danger);
+        }
+
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            width: 112px;
+            flex-shrink: 0;
+        }
+
+        .view-button,
+        .add-button {
+            display: block;
+            width: 100%;
+            padding: 9px 6px;
+            border: none;
+            border-radius: 8px;
+            background: #efedff;
+            color: var(--primary-dark);
+            font-size: 11px;
+            font-weight: 800;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .add-button {
+            background: var(--primary);
+            color: white;
+        }
+
+        .view-button:hover {
+            background: #e2dfff;
+        }
+
+        .add-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .add-button:disabled {
+            background: #d1d5db;
+            color: #555;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            padding: 50px 20px;
+            border: 1px dashed #d4d7e2;
+            border-radius: 16px;
+            background: white;
+            text-align: center;
+        }
+
+        .empty-icon {
+            margin-bottom: 10px;
+            font-size: 45px;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            margin-bottom: 18px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .clear-link {
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        footer {
+            padding: 30px 0;
+            background: var(--dark);
+            color: white;
+        }
+
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        .footer-brand {
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .footer-text {
+            margin-top: 5px;
+            color: #a9afbf;
+            font-size: 12px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 17px;
+            font-size: 12px;
+        }
+
+        .footer-links a:hover {
+            color: #b6b2ff;
+        }
+
+        @media (max-width: 1000px) {
+            .product-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .hero-panel {
+                padding: 40px;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .header-inner {
+                padding: 14px 0;
+                flex-wrap: wrap;
+                gap: 13px;
+            }
+
+            .logo {
+                font-size: 23px;
+            }
+
+            .header-actions {
+                gap: 11px;
+            }
+
+            .search-form {
+                order: 3;
+                width: 100%;
+            }
+
+            .track-order-link {
+                order: 4;
+                width: 100%;
+            }
+
+            .hero {
+                padding-top: 25px;
+            }
+
+            .hero-panel {
+                padding: 32px 24px;
+            }
+
+            .hero-panel::after {
+                right: -20px;
+                top: 25px;
+                font-size: 145px;
+            }
+
+            .benefits {
+                grid-template-columns: 1fr;
+                gap: 9px;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .product-art,
+            .product-art img {
+                height: 155px;
+                min-height: 155px;
+            }
+
+            .product-art .emoji {
+                font-size: 58px;
+            }
+
+            .product-info {
+                padding: 11px;
+            }
+
+            .product-name {
+                font-size: 13px;
+            }
+
+            .product-price {
+                font-size: 15px;
+            }
+
+            .product-actions {
+                width: 100px;
+            }
+
+            .view-button,
+            .add-button {
+                font-size: 10px;
+                padding: 9px 4px;
+            }
+        }
+
+        @media (max-width: 390px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .product-art,
+            .product-art img {
+                height: 190px;
+                min-height: 190px;
+            }
+
+            .product-actions {
+                width: 115px;
+            }
+        }
+        
+.header-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.header-actions .account-link {
+    display: inline-block;
+    padding: 10px 14px;
+    border-radius: 9px;
+    background: var(--primary);
+    color: white;
+}
+
+.header-actions .account-link:hover {
+    background: var(--primary-dark);
+    color: white;
+}
+
+.header-actions .account-button {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 9px;
+    background: #f0efff;
+    color: var(--primary-dark);
+    cursor: pointer;
+}
+
+.header-actions form {
+    margin: 0;
+}
+
+.admin-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border-radius: 9px;
+    background: #171923;
+    color: white !important;
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.admin-link:hover {
+    background: #34384a;
+}
+
+/* ===== NOVA product layout fix ===== */
+
+.products-section {
+    width: min(1180px, 92%);
+    max-width: 1180px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 30px 0 70px;
+    scroll-margin-top: 110px;
+}
+
+.product-grid {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px;
+    align-items: stretch;
+}
+
+/* Center search results, especially when only one product matches */
+.search-results-mode .product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 300px));
+    justify-content: center;
+    gap: 24px;
+}
+
+.search-results-mode .product-card {
+    width: 100%;
+    max-width: 300px;
+    justify-self: center;
+}
+
+.search-results-mode .section-heading {
+    margin-bottom: 24px;
+}
+
+@media (max-width: 1000px) {
+    .product-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .products-section {
+        width: 92%;
+    }
+
+    .product-grid,
+    .search-results-mode .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .search-results-mode .product-card {
+        max-width: none;
+    }
+}
+
+@media (max-width: 420px) {
+    .product-grid,
+    .search-results-mode .product-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+
+    </style>
+</head>
+<body>
+
+    
+    <header class="header">
+        <div class="container header-inner">
+
+            <a class="logo" href="{% url 'products:list' %}">
+                NOVA<span>.</span>
+            </a>
+
+            
+<form
+    class="search-form"
+    method="get"
+    action="{% url 'products:list' %}#product-results"
+>
+
+                {% if selected_category %}
+                    <input
+                        type="hidden"
+                        name="category"
+                        value="{{ selected_category }}"
+                    >
+                {% endif %}
+
+                <input
+                    type="search"
+                    name="q"
+                    placeholder="Search products..."
+                    value="{{ search_query }}"
+                    aria-label="Search products"
+                >
+
+                <button class="search-button" type="submit">
+                    Search
+                </button>
+            </form>
+
+            <!-- Track Order button added here -->
+            <a
+                class="track-order-link"
+                href="{% url 'orders:track' %}"
+            >
+                📦 Track Order
+            </a>
+
+            
+<nav class="header-actions" aria-label="Main navigation">
+    <a class="header-link" href="{% url 'products:list' %}">
+        Home
+    </a>
+
+    <a class="header-link" href="#products">
+        Products
+    </a>
+
+    <a class="header-link" href="{% url 'cart:detail' %}">
+        🛒 Cart
+    </a>
+
+{% if user.is_authenticated %}
+    <a class="header-link account-link" href="{% url 'products:list' %}">
+        👤 {{ user.username }}
+    </a>
+
+    <form method="post" action="{% url 'accounts:logout' %}" class="header-account-form">
+        {% csrf_token %}
+        <button type="submit" class="header-link account-button">
+            Logout
+        </button>
+    </form>
+{% else %}
+    <a class="header-link account-link" href="{% url 'accounts:login' %}">
+        👤 Login
+    </a>
+{% endif %}
+
+
+
+{% if not user.is_authenticated %}
+    <a class="header-link admin-link"
+       href="{% url 'admin:login' %}?next={% url 'admin:index' %}">
+        ⚙️ Admin Login
+    </a>
+{% endif %}
+
+
+</nav>
+
+
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-panel">
+                    <span class="eyebrow">Your everyday marketplace</span>
+
+                    <h1>Find your next favorite thing.</h1>
+
+                    <p>
+                        Discover products for your everyday life.
+                        Browse our collection, explore categories,
+                        and find something made for you.
+                    </p>
+
+                    <a class="hero-button" href="#products">
+                        Explore Products →
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="container benefits">
+            <div class="benefit">
+                <div class="benefit-icon">🛍️</div>
+                <div>
+                    <strong>Explore Our Collection</strong>
+                    <small>Products for everyday needs</small>
+                </div>
+            </div>
+
+            <div class="benefit">
+                <div class="benefit-icon">🔎</div>
+                <div>
+                    <strong>Easy Product Search</strong>
+                    <small>Find products in seconds</small>
+                </div>
+            </div>
+
+            <div class="benefit">
+                <div class="benefit-icon">✨</div>
+                <div>
+                    <strong>Simple Shopping</strong>
+                    <small>A clean, easy-to-use store</small>
+                </div>
+            </div>
+        </section>
+
+        
+<section class="container products-section {% if search_query %}search-results-mode{% endif %}" id="product-results"></section><section class="products-section" id="product-results">
+
+
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">The collection</span>
+                    <h2>Explore Products</h2>
+
+                    <p>
+                        {% if search_query %}
+                            Search results for "{{ search_query }}"
+                        {% elif selected_category %}
+                            Products in the selected category
+                        {% else %}
+                            Find something you'll love.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="product-count">
+                    {{ products|length }}
+                    product{{ products|length|pluralize }}
+                </div>
+            </div>
+
+            <nav class="category-filters" aria-label="Product categories">
+
+                <a
+                    class="category-chip {% if not selected_category %}active{% endif %}"
+                    href="{% url 'products:list' %}{% if search_query %}?q={{ search_query|urlencode }}{% endif %}"
+                >
+                    All Products
+                </a>
+
+                {% for category in categories %}
+                    <a
+                        class="category-chip {% if selected_category == category.slug %}active{% endif %}"
+                        href="{% url 'products:list' %}?category={{ category.slug|urlencode }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"
+                    >
+                        {{ category.name }}
+                    </a>
+                {% endfor %}
+
+            </nav>
+
+            <div class="product-grid">
+
+                {% for product in products %}
+
+                    <article class="product-card">
+
+                        <div class="product-art">
+
+                            {% if forloop.counter|divisibleby:4 %}
+                                <span class="product-tag">Discover</span>
+                            {% elif forloop.counter|divisibleby:3 %}
+                                <span class="product-tag">Popular</span>
+                            {% elif forloop.counter|divisibleby:2 %}
+                                <span class="product-tag">Featured</span>
+                            {% else %}
+                                <span class="product-tag">Collection</span>
+                            {% endif %}
+
+                            <button
+                                type="button"
+                                class="wishlist-button"
+                                aria-label="Add {{ product.name }} to wishlist"
+                                aria-pressed="false"
+                                title="Toggle wishlist"
+                            >
+                                ♡
+                            </button>
+
+                            {% if product.image %}
+                                <img
+                                    src="{{ product.image.url }}"
+                                    alt="{{ product.name }}"
+                                    loading="lazy"
+                                >
+                            {% else %}
+                                <span class="emoji" aria-hidden="true">
+                                    {% if forloop.counter|divisibleby:6 %}
+                                        🎒
+                                    {% elif forloop.counter|divisibleby:5 %}
+                                        🎧
+                                    {% elif forloop.counter|divisibleby:4 %}
+                                        ⌚
+                                    {% elif forloop.counter|divisibleby:3 %}
+                                        👟
+                                    {% elif forloop.counter|divisibleby:2 %}
+                                        🎁
+                                    {% else %}
+                                        🛍️
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="product-info">
+
+                            <div class="product-category">
+                                {{ product.category.name }}
+                            </div>
+
+                            <h3 class="product-name">
+                                <a href="{% url 'products:detail' product.slug %}">
+                                    {{ product.name }}
+                                </a>
+                            </h3>
+
+                            <p class="product-description">
+                                {% if product.description %}
+                                    {{ product.description|truncatewords:9 }}
+                                {% else %}
+                                    Discover more about this product.
+                                {% endif %}
+                            </p>
+
+                            <div class="product-bottom">
+
+                                <div>
+                                    <div class="product-price">
+                                        {{ product.price|floatformat:2 }}
+                                    </div>
+
+                                    {% if product.stock > 0 %}
+                                        <div class="stock-label">
+                                            In stock
+                                        </div>
+                                    {% else %}
+                                        <div class="stock-label out-of-stock">
+                                            Out of stock
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="product-actions">
+
+                                    <a
+                                        class="view-button"
+                                        href="{% url 'products:detail' product.slug %}"
+                                    >
+                                        View Details
+                                    </a>
+
+                                    {% if product.stock > 0 %}
+                                        <form
+                                            method="post"
+                                            action="{% url 'cart:add' product.id %}"
+                                        >
+                                            {% csrf_token %}
+
+                                            <button
+                                                type="submit"
+                                                class="add-button"
+                                            >
+                                                Add to Cart +
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <button
+                                            type="button"
+                                            class="add-button"
+                                            disabled
+                                        >
+                                            Out of Stock
+                                        </button>
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </article>
+
+                                    {% empty %}
+
+                    <div class="empty-state">
+                        <div class="empty-icon">🔎</div>
+
+                        <h3>No products found</h3>
+
+                        <p>
+                            {% if search_query %}
+                                We couldn't find products matching
+                                "{{ search_query }}".
+                            {% else %}
+                                There are no active products to display yet.
+                                Add a product through Django admin to get started.
+                            {% endif %}
+                        </p>
+
+                        {% if search_query or selected_category %}
+                            <a
+                                class="clear-link"
+                                href="{% url 'products:list' %}"
+                            >
+                                View All Products
+                            </a>
+                        {% endif %}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-inner">
+
+            <div>
+                <a class="footer-brand" href="{% url 'products:list' %}">
+                    NOVA<span>.</span>
+                </a>
+
+                <p class="footer-text">
+                    Discover more. Shop simply.
+                </p>
+            </div>
+
+            <nav class="footer-links" aria-label="Footer navigation">
+                <a href="{% url 'products:list' %}">Home</a>
+                <a href="#products">Products</a>
+                <a href="{% url 'cart:detail' %}">Shopping Cart</a>
+            </nav>
+
+            <p class="footer-text">
+                © {% now "Y" %} NOVA Market
+            </p>
+
+        </div>
+    </footer>
+
+    <script>
+        // Demo only: wishlist selections are not saved.
+
+        document.querySelectorAll(".wishlist-button").forEach(function (button) {
+            button.addEventListener("click", function () {
+                const selected = button.classList.toggle("selected");
+
+                button.textContent = selected ? "♥" : "♡";
+                button.setAttribute("aria-pressed", String(selected));
+                button.setAttribute(
+                    "aria-label",
+                    selected ? "Remove from wishlist" : "Add to wishlist"
+                );
+            });
+        });
+    </script>
+
+</body>
+</html>

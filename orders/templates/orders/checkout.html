@@ -1,0 +1,572 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout | NOVA Market</title>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --navy: #111a35;
+            --purple: #6747f5;
+            --muted: #75809e;
+            --line: #e7e9f5;
+            --bg: #f5f6ff;
+        }
+
+        body {
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #f8f8ff, #eff0ff);
+            color: var(--navy);
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 20px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        .brand {
+            font-size: 26px;
+            font-weight: 850;
+            color: white;
+            text-decoration: none;
+            letter-spacing: -.8px;
+        }
+
+        .brand span { color: #a99aff; }
+
+        nav { display: flex; gap: 25px; }
+
+        nav a {
+            color: #e6e9f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .secure-label { font-size: 13px; color: #d9d5ff; }
+
+        main {
+            width: calc(100% - 32px);
+            max-width: 1120px;
+            margin: 38px auto 55px;
+        }
+
+        .intro { margin-bottom: 25px; }
+
+        .eyebrow {
+            color: var(--purple);
+            font-weight: 800;
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        h1 { font-size: clamp(28px, 4vw, 36px); letter-spacing: -1px; }
+
+        .subtitle {
+            color: var(--muted);
+            margin-top: 9px;
+            line-height: 1.6;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            margin-bottom: 25px;
+            background: white;
+            padding: 17px;
+            border-radius: 15px;
+            border: 1px solid var(--line);
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #8a91aa;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .step-number {
+            width: 29px;
+            height: 29px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #f0f1fa;
+            color: #78809c;
+        }
+
+        .step.active { color: var(--purple); }
+
+        .step.active .step-number {
+            color: white;
+            background: var(--purple);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(300px, .85fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 27px;
+            box-shadow: 0 12px 36px rgba(32, 40, 95, .045);
+            min-width: 0;
+        }
+
+        .card-title {
+            font-size: 21px;
+            margin-bottom: 7px;
+        }
+
+        .card-description {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 800;
+            color: #7d86a4;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 24px 0 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 17px;
+        }
+
+        .field { min-width: 0; }
+        .field.full { grid-column: 1 / -1; }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        input, textarea {
+            width: 100%;
+            border: 1px solid #dfe3f0;
+            border-radius: 10px;
+            padding: 13px 14px;
+            background: #fcfcff;
+            color: var(--navy);
+            font: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: border .2s, box-shadow .2s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px #6747f51a;
+        }
+
+        textarea { resize: vertical; min-height: 95px; }
+
+        .hint {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 7px;
+        }
+
+        .notice {
+            background: #f0fbf6;
+            border: 1px solid #d5f3e4;
+            color: #167c54;
+            border-radius: 11px;
+            padding: 13px 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .error-notice {
+            background: #fff1f1;
+            color: #a12626;
+            border: 1px solid #ffd5d5;
+            border-radius: 10px;
+            padding: 13px 15px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+
+        .summary-card { position: sticky; top: 20px; }
+
+        .summary-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .item-count {
+            background: #f0ecff;
+            color: var(--purple);
+            padding: 7px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .item-info { min-width: 0; }
+
+        .item-name {
+            font-weight: 750;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .item-quantity {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        .item-price {
+            font-size: 14px;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 19px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .summary-line strong { color: var(--navy); }
+
+        .total {
+            border-top: 1px solid var(--line);
+            padding-top: 21px;
+            margin-top: 23px;
+            color: var(--navy);
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .total strong { font-size: 23px; }
+
+        .currency-note {
+            color: var(--muted);
+            font-size: 11px;
+            text-align: right;
+            margin-top: 7px;
+        }
+
+        .place-order {
+            display: block;
+            width: 100%;
+            margin-top: 25px;
+            border: 0;
+            border-radius: 11px;
+            padding: 16px;
+            color: white;
+            background: linear-gradient(110deg, #6545f5, #8048f8);
+            font: inherit;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 8px 20px #6747f52b;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .place-order:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px #6747f53b;
+        }
+
+        .place-order:disabled {
+            opacity: .7;
+            cursor: wait;
+            transform: none;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .trust-note {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin-top: 19px;
+            padding-top: 18px;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #8790aa;
+            font-size: 12px;
+        }
+
+        @media (max-width: 800px) {
+            .layout { grid-template-columns: 1fr; }
+            .summary-card { position: static; }
+            .summary-card { order: -1; }
+        }
+
+        @media (max-width: 520px) {
+            header { padding: 18px 5%; }
+            nav { width: 100%; justify-content: space-between; gap: 10px; }
+            .secure-label { font-size: 11px; }
+            main { margin-top: 25px; }
+            .steps { padding: 13px 5px; }
+            .step { flex-direction: column; gap: 5px; font-size: 11px; }
+            .card { padding: 20px 16px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .field.full { grid-column: auto; }
+            .total strong { font-size: 20px; }
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <a class="brand" href="{% url 'products:list' %}">
+        ✦ NOVA <span>Market</span>
+    </a>
+
+    <nav>
+        <a href="{% url 'products:list' %}">Shop</a>
+        <a href="{% url 'cart:detail' %}">My cart</a>
+    </nav>
+
+    <div class="secure-label">🔒 Secure checkout</div>
+</header>
+
+<main>
+    <div class="intro">
+        <div class="eyebrow">Almost yours</div>
+        <h1>Checkout</h1>
+        <p class="subtitle">
+            Add your delivery details below to place your order.
+        </p>
+    </div>
+
+    <div class="steps" aria-label="Checkout progress">
+        <div class="step">
+            <span class="step-number">✓</span>
+            <span>Cart</span>
+        </div>
+        <div class="step active">
+            <span class="step-number">2</span>
+            <span>Delivery</span>
+        </div>
+        <div class="step">
+            <span class="step-number">3</span>
+            <span>Confirmation</span>
+        </div>
+    </div>
+
+    <div class="layout">
+        <section class="card">
+            <h2 class="card-title">Delivery information</h2>
+            <p class="card-description">
+                Tell us where to deliver your NOVA Market order.
+                Please check your details before submitting.
+            </p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="error-notice">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="notice">
+                <strong>✓ You're almost done.</strong><br>
+                Complete all required fields. Your order will be recorded
+                after you select Place order.
+            </div>
+
+            <form method="post" id="checkout-form">
+                {% csrf_token %}
+
+                <div class="section-label">Contact details</div>
+
+                <div class="form-grid">
+                    <div class="field full">
+                        <label for="customer_name">Full name *</label>
+                        <input id="customer_name" name="customer_name"
+                               type="text" autocomplete="name"
+                               placeholder="Enter your full name"
+                               maxlength="150" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Email address *</label>
+                        <input id="email" name="email" type="email"
+                               autocomplete="email"
+                               placeholder="you@example.com" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="phone">Phone number *</label>
+                        <input id="phone" name="phone" type="tel"
+                               autocomplete="tel"
+                               placeholder="Your contact number"
+                               maxlength="30" required>
+                    </div>
+                </div>
+
+                <div class="section-label">Delivery address</div>
+
+                <div class="form-grid">
+                    <div class="field full">
+                        <label for="address">Street address *</label>
+                        <textarea id="address" name="address"
+                                  autocomplete="street-address"
+                                  placeholder="House number, street, area, landmark"
+                                  required></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label for="city">City *</label>
+                        <input id="city" name="city" type="text"
+                               autocomplete="address-level2"
+                               placeholder="Enter your city"
+                               maxlength="100" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="postal_code">Postal code *</label>
+                        <input id="postal_code" name="postal_code"
+                               type="text" autocomplete="postal-code"
+                               placeholder="Enter postal code"
+                               maxlength="20" required>
+                    </div>
+                </div>
+
+                <button class="place-order" type="submit" id="submit-btn">
+                    Place order →
+                </button>
+
+                <a class="back-link" href="{% url 'cart:detail' %}">
+                    ← Return to cart
+                </a>
+            </form>
+        </section>
+
+        <aside class="card summary-card">
+            <div class="summary-heading">
+                <h2 class="card-title">Your order</h2>
+                <span class="item-count">
+                    {{ items|length }} product{{ items|length|pluralize }}
+                </span>
+            </div>
+
+            {% for item in items %}
+                <div class="order-item">
+                    <div class="item-info">
+                        <div class="item-name">{{ item.product.name }}</div>
+                        <div class="item-quantity">
+                            Quantity: {{ item.quantity }}
+                        </div>
+                    </div>
+                    <div class="item-price">
+                        Rs {{ item.subtotal|floatformat:2 }}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="card-description">Your cart is empty.</p>
+            {% endfor %}
+
+            <div class="summary-line">
+                <span>Subtotal</span>
+                <strong>Rs {{ total|floatformat:2 }}</strong>
+            </div>
+
+            <div class="summary-line">
+                <span>Shipping</span>
+                <strong>Confirm at delivery</strong>
+            </div>
+
+            <div class="summary-line total">
+                <span>Total</span>
+                <strong>Rs {{ total|floatformat:2 }}</strong>
+            </div>
+
+            <p class="currency-note">
+                Amount shown in Nepalese rupees (NPR).
+            </p>
+
+            <div class="trust-note">
+                <span>🔐</span>
+                <span>
+                    Your details are used to process your order and
+                    arrange delivery. Review your information before
+                    placing the order.
+                </span>
+            </div>
+        </aside>
+    </div>
+</main>
+
+<footer>
+    © NOVA Market · A better way to shop.
+</footer>
+
+<script>
+    document.getElementById("checkout-form").addEventListener("submit", function () {
+        const button = document.getElementById("submit-btn");
+        if (this.checkValidity()) {
+            button.disabled = true;
+            button.textContent = "Placing your order...";
+        }
+    });
+</script>
+</body>
+</html>

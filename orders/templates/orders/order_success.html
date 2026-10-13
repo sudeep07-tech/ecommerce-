@@ -1,0 +1,786 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed | NOVA Market</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --navy: #111a35;
+            --purple: #6747f5;
+            --purple-light: #f0edff;
+            --green: #13a873;
+            --muted: #74809f;
+            --line: #e7eafb;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background:
+                radial-gradient(ellipse at 15% 15%, #ffffff 0, transparent 42%),
+                linear-gradient(135deg, #f8f8ff, #eff0ff);
+            color: var(--navy);
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* Navigation */
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 22px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 20px rgba(17, 26, 53, .08);
+        }
+
+        .brand {
+            font-size: 26px;
+            font-weight: 850;
+            letter-spacing: -1px;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .brand-symbol {
+            color: #a99aff;
+            margin-right: 5px;
+        }
+
+        .brand span:last-child {
+            color: #a99aff;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        nav a {
+            color: #e4e8f7;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color .2s;
+        }
+
+        nav a:hover {
+            color: #b5a7ff;
+        }
+
+        .cart-link {
+            color: white;
+            border: 1px solid #384361;
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* Main layout */
+        main {
+            max-width: 1080px;
+            width: calc(100% - 32px);
+            margin: 38px auto 28px;
+        }
+
+        .success-card {
+            background: rgba(255, 255, 255, .97);
+            border: 1px solid rgba(255, 255, 255, .9);
+            border-radius: 22px;
+            padding: 38px;
+            box-shadow: 0 18px 55px rgba(38, 48, 110, .09);
+        }
+
+        /* Success hero */
+        .hero {
+            text-align: center;
+            padding: 0 10px 28px;
+        }
+
+        .success-icon {
+            width: 76px;
+            height: 76px;
+            border: 3px solid var(--green);
+            color: var(--green);
+            background: #f0fff8;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 43px;
+            font-weight: 500;
+            margin: 0 auto 20px;
+            animation: pop-in .55s ease-out both;
+        }
+
+        @keyframes pop-in {
+            0% {
+                opacity: 0;
+                transform: scale(.65);
+            }
+            70% {
+                transform: scale(1.08);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .success-label {
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 850;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: clamp(29px, 4vw, 39px);
+            letter-spacing: -1.2px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            color: var(--muted);
+            margin-top: 12px;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        /* Order information */
+        .order-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            background: #f4f2ff;
+            border: 1px solid #eeebff;
+            border-radius: 15px;
+            padding: 22px 10px;
+            margin-bottom: 22px;
+        }
+
+        .meta-item {
+            padding: 0 22px;
+            border-right: 1px solid #dcdaf5;
+            min-width: 0;
+        }
+
+        .meta-item:last-child {
+            border-right: none;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            color: #7a84ac;
+            font-weight: 850;
+            letter-spacing: 1.1px;
+            margin-bottom: 10px;
+        }
+
+        .meta-value {
+            font-size: 18px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #e5deff;
+            color: #6040e9;
+            padding: 8px 13px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        /* Content panels */
+        .content-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(0, .9fr);
+            gap: 20px;
+        }
+
+        .panel {
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            padding: 23px;
+            min-width: 0;
+            background: #fff;
+        }
+
+        .panel h2 {
+            font-size: 20px;
+            letter-spacing: -.4px;
+            margin-bottom: 20px;
+        }
+
+        /* Items */
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 0 0 18px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .product-icon {
+            flex: 0 0 72px;
+            width: 72px;
+            height: 78px;
+            background: linear-gradient(135deg, #f2f1ff, #e9edff);
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 35px;
+        }
+
+        .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-name {
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .item-description {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 4px;
+        }
+
+        .item-quantity {
+            display: inline-block;
+            margin-top: 9px;
+            padding: 5px 8px;
+            background: #f4f5fc;
+            color: #596684;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 750;
+        }
+
+        .item-price {
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+            align-self: flex-end;
+            padding-bottom: 2px;
+        }
+
+        .empty-items {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Summary */
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin: 19px 0;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .summary-line strong {
+            color: var(--navy);
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        .free-delivery {
+            color: var(--green) !important;
+            font-weight: 850;
+        }
+
+        .delivery-note {
+            padding: 12px;
+            border-radius: 10px;
+            background: #effbf5;
+            color: #18835a;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 18px 0;
+        }
+
+        .paid-delivery-note {
+            padding: 12px;
+            border-radius: 10px;
+            background: #f5f2ff;
+            color: #6545d9;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 18px 0;
+        }
+
+        .total-line {
+            border-top: 1px solid var(--line);
+            padding-top: 21px;
+            margin-top: 23px;
+            color: var(--navy);
+            font-size: 16px;
+            font-weight: 850;
+        }
+
+        .total-line strong {
+            font-size: 22px;
+            letter-spacing: -.5px;
+        }
+
+        .currency-note {
+            font-size: 11px;
+            color: var(--muted);
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        /* Delivery address */
+        .address-card {
+            margin-top: 20px;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            padding: 22px 24px;
+            background: #fff;
+        }
+
+        .address-heading {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            margin-bottom: 13px;
+        }
+
+        .address-icon {
+            width: 39px;
+            height: 39px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: var(--purple-light);
+            font-size: 19px;
+        }
+
+        .address-heading h2 {
+            font-size: 17px;
+        }
+
+        .address-text {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.9;
+            overflow-wrap: anywhere;
+        }
+
+        .address-text strong {
+            color: var(--navy);
+        }
+
+        /* Buttons */
+        .actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 27px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 24px;
+            border-radius: 11px;
+            font-size: 14px;
+            font-weight: 800;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(110deg, #6545f5, #8048f8);
+            color: white;
+            box-shadow: 0 8px 20px #6747f52c;
+        }
+
+        .btn-secondary {
+            color: var(--purple);
+            background: white;
+            border: 1px solid #e3ddff;
+        }
+
+        /* Trust section */
+        .trust-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            margin-top: 27px;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 11px;
+            padding: 14px;
+            border-right: 1px solid #dcdff2;
+        }
+
+        .trust-item:last-child {
+            border-right: none;
+        }
+
+        .trust-icon {
+            font-size: 24px;
+        }
+
+        .trust-item strong {
+            display: block;
+            font-size: 12px;
+        }
+
+        .trust-item small {
+            display: block;
+            color: #828ca9;
+            font-size: 11px;
+            margin-top: 5px;
+            line-height: 1.5;
+        }
+
+        footer {
+            text-align: center;
+            padding: 8px 20px 25px;
+            color: #8790aa;
+            font-size: 12px;
+        }
+
+        @media (max-width: 760px) {
+            header {
+                padding: 17px 5%;
+            }
+
+            nav {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                gap: 24px;
+            }
+
+            main {
+                margin-top: 23px;
+            }
+
+            .success-card {
+                padding: 24px 18px;
+                border-radius: 17px;
+            }
+
+            .order-meta {
+                grid-template-columns: 1fr;
+                gap: 18px;
+                padding: 19px;
+            }
+
+            .meta-item {
+                padding: 0;
+                border-right: none;
+                border-bottom: 1px solid #dcdaf5;
+                padding-bottom: 15px;
+            }
+
+            .meta-item:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .trust-row {
+                grid-template-columns: 1fr;
+            }
+
+            .trust-item {
+                justify-content: flex-start;
+                border-right: none;
+                border-bottom: 1px solid #dcdff2;
+                padding: 16px 12px;
+            }
+
+            .trust-item:last-child {
+                border-bottom: none;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .brand {
+                font-size: 22px;
+            }
+
+            .cart-link {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            .panel {
+                padding: 18px 15px;
+            }
+
+            .order-item {
+                gap: 10px;
+            }
+
+            .product-icon {
+                flex-basis: 54px;
+                width: 54px;
+                height: 60px;
+                font-size: 27px;
+            }
+
+            .item-price {
+                font-size: 12px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .actions {
+                gap: 10px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <a class="brand" href="{% url 'products:list' %}">
+        <span class="brand-symbol">✦</span>NOVA <span>Market</span>
+    </a>
+
+    <nav>
+        <a href="{% url 'products:list' %}">Shop</a>
+        <a href="{% url 'products:list' %}">Explore products</a>
+        <a href="{% url 'cart:detail' %}">Cart</a>
+    </nav>
+
+    <a class="cart-link" href="{% url 'products:list' %}">
+        Continue shopping →
+    </a>
+</header>
+
+<main>
+    <section class="success-card">
+
+        <div class="hero">
+            <div class="success-icon" aria-label="Success">✓</div>
+            <div class="success-label">Order successfully placed</div>
+            <h1>Thank you for your order!</h1>
+            <p>
+                Great choice! Your order has been recorded.
+                Keep your order number for future reference.
+            </p>
+        </div>
+
+        <section class="order-meta">
+            <div class="meta-item">
+                <div class="meta-label">ORDER NUMBER</div>
+                <div class="meta-value">#{{ order.id }}</div>
+            </div>
+
+            <div class="meta-item">
+                <div class="meta-label">ORDER DATE</div>
+                <div class="meta-value">
+                    {{ order.created_at|date:"d M Y" }}
+                </div>
+            </div>
+
+            <div class="meta-item">
+                <div class="meta-label">ORDER STATUS</div>
+                <span class="status-badge">
+                    {{ order.get_status_display }}
+                </span>
+            </div>
+        </section>
+
+        <div class="content-grid">
+
+            <section class="panel">
+                <h2>Order details</h2>
+
+                {% for item in order.items.all %}
+                    <div class="order-item">
+                        <div class="product-icon" aria-hidden="true">
+                            📦
+                        </div>
+
+                        <div class="item-info">
+                            <div class="item-name">
+                                {{ item.product_name }}
+                            </div>
+
+                            <div class="item-description">
+                                NOVA Market product
+                            </div>
+
+                            <span class="item-quantity">
+                                Qty: {{ item.quantity }}
+                            </span>
+                        </div>
+
+                        <div class="item-price">
+                            Rs {{ item.subtotal|floatformat:2 }}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="empty-items">
+                        No order items were found.
+                    </p>
+                {% endfor %}
+            </section>
+
+            <section class="panel">
+                <h2>Payment summary</h2>
+
+                <div class="summary-line">
+                    <span>Product subtotal</span>
+                    <strong>
+                        Rs {{ subtotal|floatformat:2 }}
+                    </strong>
+                </div>
+
+                <div class="summary-line">
+                    <span>Delivery charge</span>
+
+                    {% if delivery_charge == 0 %}
+                        <strong class="free-delivery">FREE</strong>
+                    {% else %}
+                        <strong>
+                            Rs {{ delivery_charge|floatformat:2 }}
+                        </strong>
+                    {% endif %}
+                </div>
+
+                {% if delivery_charge == 0 %}
+                    <div class="delivery-note">
+                        ✓ Congratulations! Your order qualifies for
+                        free delivery on purchases of Rs 20,000 or more.
+                    </div>
+                {% else %}
+                    <div class="paid-delivery-note">
+                        A delivery charge of Rs 200 applies because
+                        your product subtotal is below Rs 20,000.
+                    </div>
+                {% endif %}
+
+                <div class="summary-line total-line">
+                    <span>Total</span>
+                    <strong>
+                        Rs {{ order.total_amount|floatformat:2 }}
+                    </strong>
+                </div>
+
+                <div class="currency-note">
+                    All amounts are in Nepalese rupees (NPR).
+                </div>
+            </section>
+
+        </div>
+
+        <section class="address-card">
+            <div class="address-heading">
+                <div class="address-icon">📍</div>
+                <h2>Delivery address</h2>
+            </div>
+
+            <div class="address-text">
+                <strong>{{ order.customer_name }}</strong><br>
+                {{ order.address }}<br>
+                {{ order.city }}{% if order.postal_code %}, {{ order.postal_code }}{% endif %}<br>
+                Phone: {{ order.phone }}<br>
+                Email: {{ order.email }}
+            </div>
+        </section>
+
+        <div class="actions">
+            <a class="btn btn-primary" href="{% url 'products:list' %}">
+                🛍 Continue shopping
+            </a>
+
+            <a class="btn btn-secondary" href="{% url 'products:list' %}">
+                Explore more products →
+            </a>
+        </div>
+
+    </section>
+
+    <section class="trust-row">
+        <div class="trust-item">
+            <span class="trust-icon">🛡️</span>
+            <div>
+                <strong>Shopping with confidence</strong>
+                <small>Your order details are recorded.</small>
+            </div>
+        </div>
+
+        <div class="trust-item">
+            <span class="trust-icon">✦</span>
+            <div>
+                <strong>Quality products</strong>
+                <small>Thank you for choosing NOVA.</small>
+            </div>
+        </div>
+
+        <div class="trust-item">
+            <span class="trust-icon">🎧</span>
+            <div>
+                <strong>We're here to help</strong>
+                <small>Keep your order number handy.</small>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    © {% now "Y" %} NOVA Market. Thank you for shopping with us.
+</footer>
+
+</body>
+</html>

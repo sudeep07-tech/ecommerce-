@@ -1,0 +1,21 @@
+# Environment
+.env
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Django
+*.log
+staticfiles/
+media/*
+!media/products/
+!media/categories/
+!media/brands/
+!media/banners/
+db.sqlite3
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store

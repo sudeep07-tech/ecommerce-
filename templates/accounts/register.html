@@ -1,0 +1,425 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | NOVA Market</title>
+
+    <style>
+        :root {
+            --primary: #635bff;
+            --primary-dark: #4b44d6;
+            --dark: #171923;
+            --muted: #73788c;
+            --border: #e5e7ef;
+            --danger: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--dark);
+            background:
+                radial-gradient(ellipse at 10% 10%, #dcd9ff 0, transparent 40%),
+                radial-gradient(ellipse at 90% 90%, #d5efff 0, transparent 40%),
+                #f5f6fc;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .navbar {
+            width: 100%;
+            padding: 24px 7%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            color: var(--dark);
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .home-link {
+            color: #555b70;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .home-link:hover {
+            color: var(--primary);
+        }
+
+        .page-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 16px 50px;
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 480px;
+            padding: 38px 42px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.97);
+            box-shadow: 0 24px 70px rgba(39, 42, 90, 0.12);
+        }
+
+        .icon-box {
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 22px;
+            border-radius: 17px;
+            background: #eeecff;
+            font-size: 27px;
+        }
+
+        .eyebrow {
+            margin-bottom: 9px;
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 33px;
+            line-height: 1.2;
+            letter-spacing: -1.2px;
+        }
+
+        .subtitle {
+            margin-bottom: 25px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .field {
+            margin-bottom: 17px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 8px;
+            color: #33384b;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            outline: none;
+            background: #fbfbfe;
+            color: var(--dark);
+            font: inherit;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .field input:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(99, 91, 255, 0.12);
+        }
+
+        .field input::placeholder {
+            color: #a0a4b3;
+        }
+
+        .help-text {
+            display: block;
+            margin-top: 7px;
+            color: #858a9a;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .field-error {
+            display: block;
+            margin-top: 7px;
+            color: var(--danger);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .error-summary {
+            margin-bottom: 20px;
+            padding: 13px 15px;
+            border-radius: 10px;
+            background: #fff0f0;
+            color: #b42318;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .error-summary ul {
+            padding-left: 18px;
+        }
+
+        .messages {
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #ecfdf3;
+            color: #067647;
+            font-size: 13px;
+        }
+
+        .register-button {
+            width: 100%;
+            margin-top: 5px;
+            padding: 15px;
+            border: none;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #7168ff, #5145df);
+            color: white;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(99, 91, 255, 0.22);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .register-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(99, 91, 255, 0.3);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0;
+            color: #9a9eac;
+            font-size: 11px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .login-text {
+            color: var(--muted);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .login-text a {
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .login-text a:hover {
+            text-decoration: underline;
+        }
+
+        .security-note {
+            margin-top: 22px;
+            color: #858a9a;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .footer {
+            padding: 18px;
+            color: #858a9a;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 500px) {
+            .navbar {
+                padding: 20px 6%;
+            }
+
+            .register-card {
+                padding: 30px 23px;
+                border-radius: 20px;
+            }
+
+            h1 {
+                font-size: 29px;
+            }
+
+            .page-content {
+                padding: 15px 14px 35px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="navbar">
+        <a class="logo" href="{% url 'products:list' %}">
+            NOVA<span>.</span>
+        </a>
+
+        <a class="home-link" href="{% url 'products:list' %}">
+            ← Back to store
+        </a>
+    </header>
+
+    <main class="page-content">
+        <section class="register-card">
+
+            <div class="icon-box">✨</div>
+
+            <p class="eyebrow">Join our community</p>
+
+            <h1>Create your account</h1>
+
+            <p class="subtitle">
+                Join NOVA Market to discover great products
+                and make your shopping experience even better.
+            </p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="messages">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            {% if form.non_field_errors %}
+                <div class="error-summary">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'accounts:register' %}">
+                {% csrf_token %}
+
+                <div class="field">
+                    <label for="{{ form.username.id_for_label }}">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        name="{{ form.username.html_name }}"
+                        id="{{ form.username.id_for_label }}"
+                        placeholder="Choose a username"
+                        value="{{ form.username.value|default_if_none:'' }}"
+                        autocomplete="username"
+                        maxlength="150"
+                        required
+                        autofocus
+                    >
+
+                    {% if form.username.help_text %}
+                        <small class="help-text">
+                            {{ form.username.help_text|safe }}
+                        </small>
+                    {% endif %}
+
+                    {% for error in form.username.errors %}
+                        <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="field">
+                    <label for="{{ form.password1.id_for_label }}">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        name="{{ form.password1.html_name }}"
+                        id="{{ form.password1.id_for_label }}"
+                        placeholder="Create a strong password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    {% if form.password1.help_text %}
+                        <small class="help-text">
+                            {{ form.password1.help_text|safe }}
+                        </small>
+                    {% endif %}
+
+                    {% for error in form.password1.errors %}
+                        <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="field">
+                    <label for="{{ form.password2.id_for_label }}">
+                        Confirm password
+                    </label>
+
+                    <input
+                        type="password"
+                        name="{{ form.password2.html_name }}"
+                        id="{{ form.password2.id_for_label }}"
+                        placeholder="Enter your password again"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    {% for error in form.password2.errors %}
+                        <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="register-button">
+                    Create Account →
+                </button>
+            </form>
+
+            <div class="divider">ALREADY A MEMBER?</div>
+
+            <p class="login-text">
+                Already have an account?
+                <a href="{% url 'accounts:login' %}">
+                    Sign in
+                </a>
+            </p>
+
+            <p class="security-note">
+                🔒 Your account details are handled securely.
+            </p>
+
+        </section>
+    </main>
+
+    <footer class="footer">
+        © {% now "Y" %} NOVA Market. Discover more. Shop simply.
+    </footer>
+
+</body>
+</html>

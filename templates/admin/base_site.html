@@ -1,0 +1,160 @@
+
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<style>
+    /* Clean admin header */
+    #header {
+        padding: 16px 28px;
+        background: #172554;
+        color: #ffffff;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12);
+    }
+
+    #branding h1,
+    #branding h1 a {
+        color: #ffffff !important;
+        font-size: 23px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    #user-tools {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 8px;
+        font-size: 13px;
+        text-transform: none;
+        letter-spacing: normal;
+    }
+
+    #user-tools a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 10px 16px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 9px;
+        color: #ffffff !important;
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    #user-tools a:hover {
+        background: rgba(255, 255, 255, 0.18);
+        transform: translateY(-1px);
+    }
+
+    #user-tools .admin-view-site {
+        background: #ffffff;
+        color: #172554 !important;
+        border-color: #ffffff;
+    }
+
+    #user-tools .admin-view-site:hover {
+        background: #e0e7ff;
+    }
+
+    #user-tools .admin-logout-form {
+        display: inline-flex;
+        margin: 0;
+    }
+
+    #user-tools .admin-logout-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 10px 16px;
+        border: 1px solid #fda4af;
+        border-radius: 9px;
+        background: #be123c;
+        color: #ffffff;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    #user-tools .admin-logout-button:hover {
+        background: #9f1239;
+    }
+
+    #user-tools .admin-welcome {
+        margin-right: 8px;
+        color: #e2e8f0;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    @media (max-width: 700px) {
+        #header {
+            padding: 14px;
+        }
+
+        #user-tools {
+            justify-content: flex-start;
+            gap: 8px;
+        }
+
+        #user-tools a,
+        #user-tools .admin-logout-button {
+            padding: 9px 11px;
+            font-size: 12px;
+        }
+
+        #user-tools .admin-welcome {
+            width: 100%;
+            margin-bottom: 4px;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block usertools %}
+{% if has_permission %}
+<div id="user-tools">
+
+    <span class="admin-welcome">
+        Welcome, {{ user.get_username }}
+    </span>
+
+    {% if site_url %}
+        <a href="{{ site_url }}" class="admin-view-site">
+            🏠 View Site
+        </a>
+    {% endif %}
+
+    {% if user.has_usable_password %}
+        <a href="{% url 'admin:password_change' %}">
+            🔑 Change Password
+        </a>
+    {% endif %}
+
+    <form
+        method="post"
+        action="{% url 'admin:logout' %}"
+        class="admin-logout-form"
+    >
+        {% csrf_token %}
+        <button type="submit" class="admin-logout-button">
+            ↪ Log out
+        </button>
+    </form>
+
+</div>
+{% endif %}
+{% endblock %}
+```

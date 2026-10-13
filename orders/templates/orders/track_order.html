@@ -1,0 +1,439 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Track Order | NOVA Market</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f5f5ff;
+            color: #17203c;
+        }
+
+        header {
+            background: #111a35;
+            color: white;
+            padding: 20px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            color: white;
+            font-size: 25px;
+            font-weight: 850;
+            text-decoration: none;
+        }
+
+        .brand span { color: #a99aff; }
+
+        header a:last-child {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        main {
+            width: calc(100% - 32px);
+            max-width: 850px;
+            margin: 35px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 28px;
+            border-radius: 18px;
+            border: 1px solid #e7e8f4;
+            box-shadow: 0 12px 35px #202b6410;
+            margin-bottom: 22px;
+        }
+
+        .hero { text-align: center; }
+
+        .hero-icon {
+            width: 65px;
+            height: 65px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 16px;
+            border-radius: 18px;
+            background: #efebff;
+            font-size: 32px;
+        }
+
+        .eyebrow {
+            color: #6848ef;
+            font-weight: 800;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: clamp(27px, 5vw, 36px);
+            margin: 0 0 12px;
+        }
+
+        h2 { font-size: 20px; margin: 0 0 18px; }
+
+        .muted {
+            color: #78819b;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        form {
+            max-width: 480px;
+            margin: 25px auto 0;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 750;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 17px;
+            border: 1px solid #dfe2ef;
+            border-radius: 10px;
+            background: #fcfcff;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: 2px solid #d9d0ff;
+            border-color: #6848ef;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(110deg, #6545f5, #824af6);
+            color: white;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .error {
+            margin-top: 18px;
+            padding: 13px;
+            border-radius: 10px;
+            background: #fff0f0;
+            border: 1px solid #ffd6d6;
+            color: #a12626;
+            font-size: 13px;
+        }
+
+        .order-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 25px;
+        }
+
+        .order-heading h2 { margin-bottom: 6px; }
+
+        .badge {
+            background: #eee8ff;
+            color: #6343e6;
+            border-radius: 30px;
+            padding: 9px 13px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .meta {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            background: #f6f4ff;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .meta small {
+            display: block;
+            color: #78819b;
+            font-size: 11px;
+            font-weight: 800;
+            margin-bottom: 7px;
+        }
+
+        .meta strong {
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .stage {
+            display: flex;
+            gap: 14px;
+            min-height: 82px;
+            position: relative;
+        }
+
+        .stage:not(:last-child)::before {
+            content: "";
+            position: absolute;
+            top: 35px;
+            left: 16px;
+            height: 47px;
+            width: 3px;
+            background: #e3e5f0;
+        }
+
+        .stage.complete:not(:last-child)::before {
+            background: #16a36a;
+        }
+
+        .dot {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            place-items: center;
+            flex: 0 0 35px;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #eff0f7;
+            color: #8b93aa;
+            font-weight: 800;
+        }
+
+        .stage.complete .dot {
+            background: #dff8ec;
+            color: #139761;
+        }
+
+        .stage.current .dot {
+            background: #6848ef;
+            color: white;
+            box-shadow: 0 0 0 5px #6848ef18;
+        }
+
+        .stage h3 { margin: 4px 0 6px; font-size: 15px; }
+        .stage p { margin: 0; font-size: 13px; color: #78819b; line-height: 1.6; }
+
+        .cancelled {
+            background: #fff0f0;
+            color: #a12626;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .items { border-top: 1px solid #e8e9f3; }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #e8e9f3;
+            font-size: 14px;
+        }
+
+        .item strong { overflow-wrap: anywhere; }
+        .item p { margin: 5px 0 0; }
+
+        .address {
+            margin-top: 22px;
+            padding: 17px;
+            border-radius: 12px;
+            background: #fafaff;
+            border: 1px solid #e7e8f4;
+            font-size: 14px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        .address strong { color: #17203c; }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            color: #6848ef;
+            font-size: 14px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        footer {
+            text-align: center;
+            color: #8991a8;
+            font-size: 12px;
+            padding: 0 15px 25px;
+        }
+
+        @media (max-width: 540px) {
+            header { padding: 17px 5%; }
+            main { margin-top: 22px; }
+            .card { padding: 21px 17px; }
+            .meta { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <a class="brand" href="{% url 'products:list' %}">
+        ✦ NOVA <span>Market</span>
+    </a>
+    <a href="{% url 'products:list' %}">Continue shopping →</a>
+</header>
+
+<main>
+    <section class="card hero">
+        <div class="hero-icon">📦</div>
+        <div class="eyebrow">NOVA MARKET ORDER TRACKING</div>
+        <h1>Where's your order?</h1>
+        <p class="muted">
+            Enter your order number and checkout email to see your delivery progress.
+        </p>
+
+        {% if error_message %}
+            <div class="error">{{ error_message }}</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <label for="order_number">Order number</label>
+            <input
+                id="order_number"
+                name="order_number"
+                type="text"
+                inputmode="numeric"
+                placeholder="Example: 12"
+                value="{{ request.POST.order_number|default:'' }}"
+                required
+            >
+
+            <label for="email">Email used at checkout</label>
+            <input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder="you@example.com"
+                value="{{ request.POST.email|default:'' }}"
+                required
+            >
+
+            <button type="submit">Track my order →</button>
+        </form>
+    </section>
+
+    {% if order %}
+    <section class="card">
+        <div class="order-heading">
+            <div>
+                <div class="eyebrow">YOUR ORDER</div>
+                <h2>Order #{{ order.id }}</h2>
+                <p class="muted">
+                    Placed {{ order.created_at|date:"d M Y, g:i A" }}
+                </p>
+            </div>
+            <span class="badge">{{ order.get_status_display }}</span>
+        </div>
+
+        <div class="meta">
+            <div>
+                <small>ORDER NUMBER</small>
+                <strong>#{{ order.id }}</strong>
+            </div>
+            <div>
+                <small>ORDER STATUS</small>
+                <strong>{{ order.get_status_display }}</strong>
+            </div>
+            <div>
+                <small>ORDER TOTAL</small>
+                <strong>Rs {{ order.total_amount|floatformat:2 }}</strong>
+            </div>
+        </div>
+
+        {% if order.status == "cancelled" %}
+            <div class="cancelled">
+                <strong>This order has been cancelled.</strong><br>
+                Please contact NOVA Market if you need assistance.
+            </div>
+        {% else %}
+            <h2>Delivery progress</h2>
+
+            <div style="margin: 25px 0 30px;">
+                {% for key, label, description in tracking_steps %}
+                    <div class="stage {% if forloop.counter0 < current_step %}complete{% elif forloop.counter0 == current_step %}current{% endif %}">
+                        <div class="dot">
+                            {% if forloop.counter0 < current_step %}
+                                ✓
+                            {% else %}
+                                {{ forloop.counter }}
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h3>{{ label }}</h3>
+                            <p>{{ description }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <h2>Items in your order</h2>
+        <div class="items">
+            {% for item in order.items.all %}
+                <div class="item">
+                    <div>
+                        <strong>{{ item.product_name }}</strong>
+                        <p class="muted">Quantity: {{ item.quantity }}</p>
+                    </div>
+                    <strong>Rs {{ item.subtotal|floatformat:2 }}</strong>
+                </div>
+            {% empty %}
+                <p class="muted">No items were found for this order.</p>
+            {% endfor %}
+        </div>
+
+        <div class="address">
+            <strong>📍 Delivery address</strong><br>
+            {{ order.customer_name }}<br>
+            {{ order.address }}<br>
+            {{ order.city }}
+            {% if order.postal_code %}, {{ order.postal_code }}{% endif %}
+            <br>
+            Phone: {{ order.phone }}
+        </div>
+
+        <a class="back" href="{% url 'products:list' %}">
+            ← Continue shopping
+        </a>
+    </section>
+    {% endif %}
+</main>
+
+<footer>
+    © {% now "Y" %} NOVA Market · Thanks for shopping with us.
+</footer>
+</body>
+</html>
