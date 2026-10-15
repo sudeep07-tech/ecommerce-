@@ -7,7 +7,9 @@
     <title>Track Order | NOVA Market</title>
 
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
@@ -34,7 +36,9 @@
             text-decoration: none;
         }
 
-        .brand span { color: #a99aff; }
+        .brand span {
+            color: #a99aff;
+        }
 
         header a:last-child {
             color: white;
@@ -57,7 +61,9 @@
             margin-bottom: 22px;
         }
 
-        .hero { text-align: center; }
+        .hero {
+            text-align: center;
+        }
 
         .hero-icon {
             width: 65px;
@@ -83,7 +89,10 @@
             margin: 0 0 12px;
         }
 
-        h2 { font-size: 20px; margin: 0 0 18px; }
+        h2 {
+            font-size: 20px;
+            margin: 0 0 18px;
+        }
 
         .muted {
             color: #78819b;
@@ -129,6 +138,12 @@
             font-size: 15px;
             font-weight: 800;
             cursor: pointer;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
 
         .error {
@@ -150,7 +165,9 @@
             margin-bottom: 25px;
         }
 
-        .order-heading h2 { margin-bottom: 6px; }
+        .order-heading h2 {
+            margin-bottom: 6px;
+        }
 
         .badge {
             background: #eee8ff;
@@ -230,20 +247,55 @@
             box-shadow: 0 0 0 5px #6848ef18;
         }
 
-        .stage h3 { margin: 4px 0 6px; font-size: 15px; }
-        .stage p { margin: 0; font-size: 13px; color: #78819b; line-height: 1.6; }
+        .stage h3 {
+            margin: 4px 0 6px;
+            font-size: 15px;
+        }
 
-        .cancelled {
-            background: #fff0f0;
-            color: #a12626;
+        .stage p {
+            margin: 0;
+            font-size: 13px;
+            color: #78819b;
+            line-height: 1.6;
+        }
+
+        .cancelled,
+        .delivered-warning {
             padding: 15px;
             border-radius: 10px;
             font-size: 14px;
             line-height: 1.7;
-            margin-bottom: 24px;
+            margin: 20px 0 24px;
         }
 
-        .items { border-top: 1px solid #e8e9f3; }
+        .cancelled {
+            background: #fff0f0;
+            color: #a12626;
+            border: 1px solid #ffd6d6;
+        }
+
+        .delivered-warning {
+            background: #fff8e6;
+            color: #825b08;
+            border: 1px solid #f3dfaa;
+        }
+
+        .cancel-order-form {
+            max-width: 100%;
+            margin: 20px 0;
+        }
+
+        .cancel-order-button {
+            background: linear-gradient(110deg, #d93636, #b91c1c);
+        }
+
+        .cancel-order-button:hover {
+            background: #a91b1b;
+        }
+
+        .items {
+            border-top: 1px solid #e8e9f3;
+        }
 
         .item {
             display: flex;
@@ -254,8 +306,13 @@
             font-size: 14px;
         }
 
-        .item strong { overflow-wrap: anywhere; }
-        .item p { margin: 5px 0 0; }
+        .item strong {
+            overflow-wrap: anywhere;
+        }
+
+        .item p {
+            margin: 5px 0 0;
+        }
 
         .address {
             margin-top: 22px;
@@ -268,7 +325,9 @@
             overflow-wrap: anywhere;
         }
 
-        .address strong { color: #17203c; }
+        .address strong {
+            color: #17203c;
+        }
 
         .back {
             display: inline-block;
@@ -287,10 +346,21 @@
         }
 
         @media (max-width: 540px) {
-            header { padding: 17px 5%; }
-            main { margin-top: 22px; }
-            .card { padding: 21px 17px; }
-            .meta { grid-template-columns: 1fr; }
+            header {
+                padding: 17px 5%;
+            }
+
+            main {
+                margin-top: 22px;
+            }
+
+            .card {
+                padding: 21px 17px;
+            }
+
+            .meta {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -300,14 +370,19 @@
     <a class="brand" href="{% url 'products:list' %}">
         ✦ NOVA <span>Market</span>
     </a>
-    <a href="{% url 'products:list' %}">Continue shopping →</a>
+
+    <a href="{% url 'products:list' %}">
+        Continue shopping →
+    </a>
 </header>
 
 <main>
     <section class="card hero">
         <div class="hero-icon">📦</div>
+
         <div class="eyebrow">NOVA MARKET ORDER TRACKING</div>
         <h1>Where's your order?</h1>
+
         <p class="muted">
             Enter your order number and checkout email to see your delivery progress.
         </p>
@@ -355,6 +430,7 @@
                     Placed {{ order.created_at|date:"d M Y, g:i A" }}
                 </p>
             </div>
+
             <span class="badge">{{ order.get_status_display }}</span>
         </div>
 
@@ -363,10 +439,12 @@
                 <small>ORDER NUMBER</small>
                 <strong>#{{ order.id }}</strong>
             </div>
+
             <div>
                 <small>ORDER STATUS</small>
                 <strong>{{ order.get_status_display }}</strong>
             </div>
+
             <div>
                 <small>ORDER TOTAL</small>
                 <strong>Rs {{ order.total_amount|floatformat:2 }}</strong>
@@ -378,6 +456,7 @@
                 <strong>This order has been cancelled.</strong><br>
                 Please contact NOVA Market if you need assistance.
             </div>
+
         {% else %}
             <h2>Delivery progress</h2>
 
@@ -391,6 +470,7 @@
                                 {{ forloop.counter }}
                             {% endif %}
                         </div>
+
                         <div>
                             <h3>{{ label }}</h3>
                             <p>{{ description }}</p>
@@ -401,6 +481,7 @@
         {% endif %}
 
         <h2>Items in your order</h2>
+
         <div class="items">
             {% for item in order.items.all %}
                 <div class="item">
@@ -408,6 +489,7 @@
                         <strong>{{ item.product_name }}</strong>
                         <p class="muted">Quantity: {{ item.quantity }}</p>
                     </div>
+
                     <strong>Rs {{ item.subtotal|floatformat:2 }}</strong>
                 </div>
             {% empty %}
@@ -424,6 +506,35 @@
             <br>
             Phone: {{ order.phone }}
         </div>
+
+        {% if order.status == "delivered" %}
+            <div class="delivered-warning">
+                <strong>Order Delivered</strong><br>
+                This order cannot be cancelled because it has already been delivered.
+            </div>
+
+        {% elif order.status == "cancelled" %}
+            <div class="cancelled">
+                This order has already been cancelled.
+            </div>
+
+        {% else %}
+            <form
+                method="post"
+                action="{% url 'orders:cancel_order' order.id %}"
+                class="cancel-order-form"
+            >
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="cancel-order-button"
+                    onclick="return confirm('Are you sure you want to cancel this order?');"
+                >
+                    Cancel Order
+                </button>
+            </form>
+        {% endif %}
 
         <a class="back" href="{% url 'products:list' %}">
             ← Continue shopping

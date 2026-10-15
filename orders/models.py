@@ -31,6 +31,9 @@ class Order(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def can_be_cancelled(self):
+        return self.status not in ["delivered", "cancelled"]
+
     def __str__(self):
         return f"Order #{self.pk} - {self.customer_name}"
 
@@ -63,4 +66,3 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product_name} x {self.quantity}"
-

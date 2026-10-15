@@ -17,4 +17,11 @@ urlpatterns = [
 
     # Track order page
     path("track/", views.track_order, name="track"),
+
+    # Cancel order
+    path(
+        "cancel/<int:order_id>/",
+        views.cancel_order,
+        name="cancel_order",
+    ),
 ]

@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.contrib import messages
 from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_POST
 
 from products.models import Product
 from .models import Order, OrderItem
@@ -70,9 +71,7 @@ def checkout(request):
 
         subtotal += item_subtotal
 
-    # Calculate shipping:
-    # Rs. 200 below Rs. 20,000
-    # Free shipping at Rs. 20,000 or above
+    # Calculate delivery charges
     free_delivery = subtotal >= FREE_DELIVERY_THRESHOLD
 
     delivery_charge = (
@@ -151,7 +150,7 @@ def checkout(request):
                         "subtotal": line_total,
                     })
 
-                # Recalculate shipping using verified prices
+                # Recalculate delivery using verified prices
                 verified_free_delivery = (
                     verified_subtotal >= FREE_DELIVERY_THRESHOLD
                 )
@@ -232,10 +231,7 @@ def order_success(request, order_id):
     )
 
     subtotal = sum(
-        (
-            item.subtotal
-            for item in order.items.all()
-        ),
+        (item.subtotal for item in order.items.all()),
         Decimal("0.00"),
     )
 
@@ -296,18 +292,25 @@ def track_order(request):
                         "order number and email."
                     )
 
-                elif order.status != "cancelled":
-                    status_order = [
-                        "pending",
-                        "processing",
-                        "shipped",
-                        "delivered",
-                    ]
+                else:
+                    # Store the verified order and email
+                    # for the cancellation view.
+                    request.session["tracking_order_id"] = order.pk
+                    request.session["tracking_email"] = order.email
+                    request.session.modified = True
 
-                    if order.status in status_order:
-                        current_step = status_order.index(
-                            order.status
-                        )
+                    if order.status != "cancelled":
+                        status_order = [
+                            "pending",
+                            "processing",
+                            "shipped",
+                            "delivered",
+                        ]
+
+                        if order.status in status_order:
+                            current_step = status_order.index(
+                                order.status
+                            )
 
             except (ValueError, TypeError):
                 error_message = (
@@ -324,3 +327,54 @@ def track_order(request):
             "current_step": current_step,
         },
     )
+
+
+# ==========================================
+# CANCEL ORDER
+# ==========================================
+@require_POST
+def cancel_order(request, order_id):
+    # Ensure the customer has verified this exact order
+    tracking_order_id = request.session.get(
+        "tracking_order_id"
+    )
+    tracking_email = request.session.get(
+        "tracking_email"
+    )
+
+    if tracking_order_id != order_id or not tracking_email:
+        messages.error(
+            request,
+            "Please verify your order number and email on the tracking page first.",
+        )
+        return redirect("orders:track")
+
+    with transaction.atomic():
+        order = get_object_or_404(
+            Order.objects.select_for_update(),
+            pk=order_id,
+            email__iexact=tracking_email,
+        )
+
+        if order.status == "delivered":
+            messages.error(
+                request,
+                "This order cannot be cancelled because it has already been delivered.",
+            )
+
+        elif order.status == "cancelled":
+            messages.info(
+                request,
+                "This order has already been cancelled.",
+            )
+
+        else:
+            order.status = "cancelled"
+            order.save(update_fields=["status"])
+
+            messages.success(
+                request,
+                "Your order has been cancelled successfully.",
+            )
+
+    return redirect("orders:track")
