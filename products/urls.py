@@ -6,7 +6,18 @@ app_name = "products"
 
 urlpatterns = [
     # Homepage and product search
-    path("", views.product_list, name="list"),
+    path(
+        "",
+        views.product_list,
+        name="list",
+    ),
+
+    # Live product-name suggestions
+    path(
+        "suggestions/",
+        views.product_name_suggestions,
+        name="product_suggestions",
+    ),
 
     # Product details
     path(

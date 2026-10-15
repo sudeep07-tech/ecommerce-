@@ -345,7 +345,8 @@ def cancel_order(request, order_id):
     if tracking_order_id != order_id or not tracking_email:
         messages.error(
             request,
-            "Please verify your order number and email on the tracking page first.",
+            "Please verify your order number and email "
+            "on the tracking page first.",
         )
         return redirect("orders:track")
 
@@ -359,7 +360,8 @@ def cancel_order(request, order_id):
         if order.status == "delivered":
             messages.error(
                 request,
-                "This order cannot be cancelled because it has already been delivered.",
+                "This order cannot be cancelled because "
+                "it has already been delivered.",
             )
 
         elif order.status == "cancelled":
