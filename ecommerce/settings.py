@@ -1,33 +1,43 @@
+
 from pathlib import Path
 import os
 
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from the project root
+load_dotenv(BASE_DIR / ".env")
+
+
 # Security
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY",
-    "django-insecure-replace-this-with-your-own-secret-key",
-)
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
-DEBUG = True
+if not SECRET_KEY:
+    raise ValueError(
+        "DJANGO_SECRET_KEY is missing. Check your project-root .env file."
+    )
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+DEBUG = os.getenv("DEBUG", "True").lower() == "true"
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv(
+        "ALLOWED_HOSTS", "localhost,127.0.0.1"
+    ).split(",")
+    if host.strip()
+]
 
 
 # Applications
 INSTALLED_APPS = [
-    # Django built-in applications
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    # Third-party applications
     "django_filters",
-
-    # E-commerce applications
     "accounts",
     "products",
     "categories",
@@ -85,24 +95,21 @@ TEMPLATES = [
 WSGI_APPLICATION = "ecommerce.wsgi.application"
 
 
-# Database: MySQL
-# IMPORTANT:
-# Keep your ORIGINAL working database name, username,
-# password, host, and port. Do not use these placeholders
-# unless you replace them with your real credentials.
+# MySQL database
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        'NAME': 'ecommerce_db',
-        "USER": "root",
-        "PASSWORD": "sudeepkoghoda",
-        "HOST": "localhost",
-        "PORT": "3306",
+        "NAME": os.getenv("DB_NAME", "ecommerce_db"),
+        "USER": os.getenv("DB_USER", "root"),
+        "PASSWORD": os.getenv("DB_PASSWORD", ""),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "3306"),
         "OPTIONS": {
             "charset": "utf8mb4",
         },
     }
 }
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -133,7 +140,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Authentication and login settings
+# Authentication
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
@@ -141,7 +148,7 @@ LOGOUT_REDIRECT_URL = "/"
 
 # Language and timezone
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = "Asia/Kathmandu"
+TIME_ZONE = os.getenv("TIME_ZONE", "Asia/Kathmandu")
 USE_I18N = True
 USE_TZ = True
 
