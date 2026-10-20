@@ -5,8 +5,19 @@ from . import views
 app_name = "orders"
 
 urlpatterns = [
-    # Checkout page
-    path("checkout/", views.checkout, name="checkout"),
+    # Checkout page: customer delivery details
+    path(
+        "checkout/",
+        views.checkout,
+        name="checkout",
+    ),
+
+    # Payment method selection: Cash on Delivery or Khalti demo
+    path(
+        "payment-method/",
+        views.payment_method,
+        name="payment_method",
+    ),
 
     # Order success page
     path(
@@ -16,7 +27,11 @@ urlpatterns = [
     ),
 
     # Track order page
-    path("track/", views.track_order, name="track"),
+    path(
+        "track/",
+        views.track_order,
+        name="track",
+    ),
 
     # Cancel order
     path(

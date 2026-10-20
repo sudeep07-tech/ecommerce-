@@ -10,9 +10,10 @@ from products.models import Product
 from .models import Order, OrderItem
 
 
-# Delivery settings
+# Delivery and payment settings
 FREE_DELIVERY_THRESHOLD = Decimal("20000.00")
 DELIVERY_CHARGE = Decimal("200.00")
+COD_CHARGE = Decimal("20.00")
 
 
 # Order tracking progress
@@ -25,19 +26,18 @@ TRACKING_STEPS = [
 
 
 # ==========================================
-# CHECKOUT
+# HELPER: BUILD AND VALIDATE CART
 # ==========================================
-def checkout(request):
+def _get_cart_items(request):
     cart = request.session.get("shopping_cart", {})
 
     if not cart:
         messages.error(request, "Your shopping cart is empty.")
-        return redirect("cart:detail")
+        return None
 
     items = []
     subtotal = Decimal("0.00")
 
-    # Get cart products
     for product_id, quantity in cart.items():
         try:
             product = Product.objects.get(
@@ -52,26 +52,35 @@ def checkout(request):
                 request,
                 "A product in your cart is no longer available.",
             )
-            return redirect("cart:detail")
+            return None
 
         if quantity < 1 or quantity > product.stock:
             messages.error(
                 request,
                 f"Please check the quantity for {product.name}.",
             )
-            return redirect("cart:detail")
+            return None
 
-        item_subtotal = product.price * quantity
+        line_total = product.price * quantity
 
         items.append({
             "product": product,
             "quantity": quantity,
-            "subtotal": item_subtotal,
+            "subtotal": line_total,
         })
 
-        subtotal += item_subtotal
+        subtotal += line_total
 
-    # Calculate delivery charges
+    return items, subtotal
+
+
+def _checkout_totals(subtotal, payment_method="khalti"):
+    """
+    Calculate delivery and payment totals.
+
+    The COD charge is added only for Cash on Delivery.
+    Free delivery is determined by the product subtotal.
+    """
     free_delivery = subtotal >= FREE_DELIVERY_THRESHOLD
 
     delivery_charge = (
@@ -80,37 +89,55 @@ def checkout(request):
         else DELIVERY_CHARGE
     )
 
-    total = subtotal + delivery_charge
+    cod_charge = (
+        COD_CHARGE
+        if payment_method == "cod"
+        else Decimal("0.00")
+    )
+
+    return {
+        "free_delivery": free_delivery,
+        "delivery_charge": delivery_charge,
+        "cod_charge": cod_charge,
+        "total": subtotal + delivery_charge + cod_charge,
+    }
+
+
+# ==========================================
+# CHECKOUT: CUSTOMER AND DELIVERY DETAILS
+# ==========================================
+def checkout(request):
+    result = _get_cart_items(request)
+
+    if result is None:
+        return redirect("cart:detail")
+
+    items, subtotal = result
+    totals = _checkout_totals(subtotal)
 
     context = {
         "items": items,
         "subtotal": subtotal,
-        "delivery_charge": delivery_charge,
-        "shipping": delivery_charge,
-        "free_delivery": free_delivery,
+        **totals,
+        "shipping": totals["delivery_charge"],
         "free_delivery_threshold": FREE_DELIVERY_THRESHOLD,
-        "total": total,
     }
 
-    # Process checkout form
     if request.method == "POST":
-        customer_name = request.POST.get(
-            "customer_name", ""
-        ).strip()
+        customer_details = {
+            "customer_name": request.POST.get(
+                "customer_name", ""
+            ).strip(),
+            "email": request.POST.get("email", "").strip(),
+            "phone": request.POST.get("phone", "").strip(),
+            "address": request.POST.get("address", "").strip(),
+            "city": request.POST.get("city", "").strip(),
+            "postal_code": request.POST.get(
+                "postal_code", ""
+            ).strip(),
+        }
 
-        email = request.POST.get("email", "").strip()
-        phone = request.POST.get("phone", "").strip()
-        address = request.POST.get("address", "").strip()
-        city = request.POST.get("city", "").strip()
-        postal_code = request.POST.get("postal_code", "").strip()
-
-        if not all([
-            customer_name,
-            email,
-            phone,
-            address,
-            city,
-        ]):
+        if not all(customer_details.values()):
             messages.error(
                 request,
                 "Please fill in all required delivery details.",
@@ -121,104 +148,200 @@ def checkout(request):
                 context,
             )
 
-        try:
-            with transaction.atomic():
-                verified_subtotal = Decimal("0.00")
-                verified_items = []
-
-                # Recheck product prices and stock
-                for product_id, quantity in cart.items():
-                    product = Product.objects.select_for_update().get(
-                        pk=int(product_id),
-                        is_active=True,
-                        category__is_active=True,
-                    )
-
-                    quantity = int(quantity)
-
-                    if quantity < 1 or quantity > product.stock:
-                        raise ValueError(
-                            f"Not enough stock for {product.name}."
-                        )
-
-                    line_total = product.price * quantity
-                    verified_subtotal += line_total
-
-                    verified_items.append({
-                        "product": product,
-                        "quantity": quantity,
-                        "subtotal": line_total,
-                    })
-
-                # Recalculate delivery using verified prices
-                verified_free_delivery = (
-                    verified_subtotal >= FREE_DELIVERY_THRESHOLD
-                )
-
-                verified_delivery = (
-                    Decimal("0.00")
-                    if verified_free_delivery
-                    else DELIVERY_CHARGE
-                )
-
-                verified_total = (
-                    verified_subtotal + verified_delivery
-                )
-
-                # Create order
-                order = Order.objects.create(
-                    customer_name=customer_name,
-                    email=email,
-                    phone=phone,
-                    address=address,
-                    city=city,
-                    postal_code=postal_code,
-                    status="pending",
-                    total_amount=verified_total,
-                )
-
-                # Save order items and reduce stock
-                for item in verified_items:
-                    product = item["product"]
-                    quantity = item["quantity"]
-
-                    OrderItem.objects.create(
-                        order=order,
-                        product=product,
-                        product_name=product.name,
-                        unit_price=product.price,
-                        quantity=quantity,
-                        subtotal=item["subtotal"],
-                    )
-
-                    product.stock -= quantity
-                    product.save(update_fields=["stock"])
-
-        except (
-            Product.DoesNotExist,
-            ValueError,
-            TypeError,
-        ) as exc:
-            messages.error(
-                request,
-                str(exc) or "Unable to place your order.",
-            )
-            return redirect("cart:detail")
-
-        # Empty the cart after a successful order
-        request.session["shopping_cart"] = {}
+        request.session["checkout_details"] = customer_details
         request.session.modified = True
 
-        return redirect(
-            "orders:success",
-            order_id=order.id,
+        return redirect("orders:payment_method")
+
+    return render(request, "orders/checkout.html", context)
+
+
+# ==========================================
+# PAYMENT METHOD: COD OR KHALTI DEMO
+# ==========================================
+def payment_method(request):
+    customer_details = request.session.get("checkout_details")
+
+    if not customer_details:
+        messages.error(
+            request,
+            "Please enter your delivery details first.",
+        )
+        return redirect("orders:checkout")
+
+    result = _get_cart_items(request)
+
+    if result is None:
+        request.session.pop("checkout_details", None)
+        request.session.modified = True
+        return redirect("cart:detail")
+
+    items, subtotal = result
+
+    # Default display: no COD charge until COD is selected.
+    selected_method = request.POST.get(
+        "payment_method", "khalti"
+    ).strip()
+
+    if selected_method not in ("cod", "khalti"):
+        selected_method = "khalti"
+
+    totals = _checkout_totals(subtotal, selected_method)
+
+    context = {
+        "items": items,
+        "subtotal": subtotal,
+        **totals,
+        "selected_method": selected_method,
+    }
+
+    if request.method != "POST":
+        # Initial page: show the base total.
+        context.update(_checkout_totals(subtotal, "khalti"))
+        context["selected_method"] = "khalti"
+
+        return render(
+            request,
+            "orders/payment_method.html",
+            context,
         )
 
-    return render(
-        request,
-        "orders/checkout.html",
-        context,
-    )
+    selected_method = request.POST.get(
+        "payment_method", ""
+    ).strip()
+
+    if selected_method not in ("cod", "khalti"):
+        messages.error(
+            request,
+            "Please select Cash on Delivery or Khalti.",
+        )
+        context["selected_method"] = "khalti"
+        context.update(_checkout_totals(subtotal, "khalti"))
+
+        return render(
+            request,
+            "orders/payment_method.html",
+            context,
+        )
+
+    # Khalti is display/demo only. No gateway is contacted.
+    if selected_method == "khalti":
+        messages.warning(
+            request,
+            "Khalti is not connected. No online payment "
+            "will be processed or verified.",
+        )
+
+    try:
+        with transaction.atomic():
+            verified_subtotal = Decimal("0.00")
+            verified_items = []
+
+            # Recheck stock and prices inside the transaction.
+            cart = request.session.get("shopping_cart", {})
+
+            if not cart:
+                raise ValueError("Your shopping cart is empty.")
+
+            for product_id, quantity in cart.items():
+                product = Product.objects.select_for_update().get(
+                    pk=int(product_id),
+                    is_active=True,
+                    category__is_active=True,
+                )
+
+                quantity = int(quantity)
+
+                if quantity < 1 or quantity > product.stock:
+                    raise ValueError(
+                        f"Not enough stock for {product.name}."
+                    )
+
+                line_total = product.price * quantity
+                verified_subtotal += line_total
+
+                verified_items.append({
+                    "product": product,
+                    "quantity": quantity,
+                    "subtotal": line_total,
+                })
+
+            # Recalculate all charges using verified prices.
+            verified_delivery = (
+                Decimal("0.00")
+                if verified_subtotal >= FREE_DELIVERY_THRESHOLD
+                else DELIVERY_CHARGE
+            )
+
+            verified_cod_charge = (
+                COD_CHARGE
+                if selected_method == "cod"
+                else Decimal("0.00")
+            )
+
+            final_total = (
+                verified_subtotal
+                + verified_delivery
+                + verified_cod_charge
+            )
+
+            order = Order.objects.create(
+                customer_name=customer_details["customer_name"],
+                email=customer_details["email"],
+                phone=customer_details["phone"],
+                address=customer_details["address"],
+                city=customer_details["city"],
+                postal_code=customer_details["postal_code"],
+                status="pending",
+                total_amount=final_total,
+            )
+
+            for item in verified_items:
+                product = item["product"]
+                quantity = item["quantity"]
+
+                OrderItem.objects.create(
+                    order=order,
+                    product=product,
+                    product_name=product.name,
+                    unit_price=product.price,
+                    quantity=quantity,
+                    subtotal=item["subtotal"],
+                )
+
+                product.stock -= quantity
+                product.save(update_fields=["stock"])
+
+    except (
+        Product.DoesNotExist,
+        ValueError,
+        TypeError,
+    ) as exc:
+        messages.error(
+            request,
+            str(exc) or "Unable to place your order.",
+        )
+        return redirect("cart:detail")
+
+    # Clear session data only after the order is saved.
+    request.session["shopping_cart"] = {}
+    request.session.pop("checkout_details", None)
+    request.session.modified = True
+
+    if selected_method == "cod":
+        messages.success(
+            request,
+            "Your Cash on Delivery order has been placed "
+            "successfully. The NPR 20 COD charge is included.",
+        )
+    else:
+        messages.warning(
+            request,
+            "Demo order created successfully. No Khalti "
+            "payment was made or verified.",
+        )
+
+    return redirect("orders:success", order_id=order.pk)
 
 
 # ==========================================
@@ -235,7 +358,8 @@ def order_success(request, order_id):
         Decimal("0.00"),
     )
 
-    delivery_charge = order.total_amount - subtotal
+    # Difference includes delivery and any COD charge.
+    additional_charges = order.total_amount - subtotal
 
     return render(
         request,
@@ -243,7 +367,8 @@ def order_success(request, order_id):
         {
             "order": order,
             "subtotal": subtotal,
-            "delivery_charge": delivery_charge,
+            "delivery_charge": additional_charges,
+            "additional_charges": additional_charges,
         },
     )
 
@@ -261,16 +386,13 @@ def track_order(request):
             "order_number", ""
         ).strip()
 
-        email = request.POST.get(
-            "email", ""
-        ).strip()
+        email = request.POST.get("email", "").strip()
 
         if not order_number or not email:
             error_message = (
                 "Please enter both your order number "
                 "and email address."
             )
-
         else:
             try:
                 order_id = int(order_number)
@@ -291,10 +413,7 @@ def track_order(request):
                         "those details. Please check your "
                         "order number and email."
                     )
-
                 else:
-                    # Store the verified order and email
-                    # for the cancellation view.
                     request.session["tracking_order_id"] = order.pk
                     request.session["tracking_email"] = order.email
                     request.session.modified = True
@@ -313,9 +432,7 @@ def track_order(request):
                             )
 
             except (ValueError, TypeError):
-                error_message = (
-                    "Please enter a valid order number."
-                )
+                error_message = "Please enter a valid order number."
 
     return render(
         request,
@@ -334,13 +451,8 @@ def track_order(request):
 # ==========================================
 @require_POST
 def cancel_order(request, order_id):
-    # Ensure the customer has verified this exact order
-    tracking_order_id = request.session.get(
-        "tracking_order_id"
-    )
-    tracking_email = request.session.get(
-        "tracking_email"
-    )
+    tracking_order_id = request.session.get("tracking_order_id")
+    tracking_email = request.session.get("tracking_email")
 
     if tracking_order_id != order_id or not tracking_email:
         messages.error(
@@ -360,16 +472,14 @@ def cancel_order(request, order_id):
         if order.status == "delivered":
             messages.error(
                 request,
-                "This order cannot be cancelled because "
-                "it has already been delivered.",
+                "This order cannot be cancelled because it "
+                "has already been delivered.",
             )
-
         elif order.status == "cancelled":
             messages.info(
                 request,
                 "This order has already been cancelled.",
             )
-
         else:
             order.status = "cancelled"
             order.save(update_fields=["status"])
