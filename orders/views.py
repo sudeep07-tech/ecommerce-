@@ -26,6 +26,23 @@ TRACKING_STEPS = [
 
 
 # ==========================================
+# HELPER: BLOCK ADMIN AND STAFF FROM SHOPPING
+# ==========================================
+def admin_cannot_shop(request):
+    user = request.user
+
+    if user.is_authenticated and (user.is_staff or user.is_superuser):
+        messages.warning(
+            request,
+            "You cannot shop using an admin account. "
+            "Please log in with a customer account to place an order.",
+        )
+        return True
+
+    return False
+
+
+# ==========================================
 # HELPER: BUILD AND VALIDATE CART
 # ==========================================
 def _get_cart_items(request):
@@ -74,13 +91,10 @@ def _get_cart_items(request):
     return items, subtotal
 
 
+# ==========================================
+# HELPER: CALCULATE CHECKOUT TOTALS
+# ==========================================
 def _checkout_totals(subtotal, payment_method="khalti"):
-    """
-    Calculate delivery and payment totals.
-
-    The COD charge is added only for Cash on Delivery.
-    Free delivery is determined by the product subtotal.
-    """
     free_delivery = subtotal >= FREE_DELIVERY_THRESHOLD
 
     delivery_charge = (
@@ -107,6 +121,10 @@ def _checkout_totals(subtotal, payment_method="khalti"):
 # CHECKOUT: CUSTOMER AND DELIVERY DETAILS
 # ==========================================
 def checkout(request):
+    # Never allow staff/admin accounts to proceed to checkout.
+    if admin_cannot_shop(request):
+        return redirect("cart:detail")
+
     result = _get_cart_items(request)
 
     if result is None:
@@ -160,6 +178,10 @@ def checkout(request):
 # PAYMENT METHOD: COD OR KHALTI DEMO
 # ==========================================
 def payment_method(request):
+    # Also protect the payment URL if an admin opens it directly.
+    if admin_cannot_shop(request):
+        return redirect("cart:detail")
+
     customer_details = request.session.get("checkout_details")
 
     if not customer_details:
@@ -178,7 +200,6 @@ def payment_method(request):
 
     items, subtotal = result
 
-    # Default display: no COD charge until COD is selected.
     selected_method = request.POST.get(
         "payment_method", "khalti"
     ).strip()
@@ -196,7 +217,6 @@ def payment_method(request):
     }
 
     if request.method != "POST":
-        # Initial page: show the base total.
         context.update(_checkout_totals(subtotal, "khalti"))
         context["selected_method"] = "khalti"
 
@@ -224,7 +244,7 @@ def payment_method(request):
             context,
         )
 
-    # Khalti is display/demo only. No gateway is contacted.
+    # Khalti is currently demo-only; no payment is processed.
     if selected_method == "khalti":
         messages.warning(
             request,
@@ -237,7 +257,6 @@ def payment_method(request):
             verified_subtotal = Decimal("0.00")
             verified_items = []
 
-            # Recheck stock and prices inside the transaction.
             cart = request.session.get("shopping_cart", {})
 
             if not cart:
@@ -266,7 +285,6 @@ def payment_method(request):
                     "subtotal": line_total,
                 })
 
-            # Recalculate all charges using verified prices.
             verified_delivery = (
                 Decimal("0.00")
                 if verified_subtotal >= FREE_DELIVERY_THRESHOLD
@@ -294,6 +312,7 @@ def payment_method(request):
                 postal_code=customer_details["postal_code"],
                 status="pending",
                 total_amount=final_total,
+                khalti_pidx=None,
             )
 
             for item in verified_items:
@@ -323,7 +342,6 @@ def payment_method(request):
         )
         return redirect("cart:detail")
 
-    # Clear session data only after the order is saved.
     request.session["shopping_cart"] = {}
     request.session.pop("checkout_details", None)
     request.session.modified = True
@@ -358,7 +376,6 @@ def order_success(request, order_id):
         Decimal("0.00"),
     )
 
-    # Difference includes delivery and any COD charge.
     additional_charges = order.total_amount - subtotal
 
     return render(
