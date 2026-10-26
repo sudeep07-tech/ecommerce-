@@ -1,0 +1,354 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write a Review | NOVA Market</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 16px;
+            font-family: Arial, sans-serif;
+            background: #f4f7fc;
+            color: #1f2937;
+        }
+
+        .review-card {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 35px;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 10px 35px rgba(30, 64, 175, 0.09);
+        }
+
+        .brand {
+            color: #2563eb;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 28px;
+            color: #172554;
+        }
+
+        .subtitle {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .field {
+            margin-bottom: 24px;
+        }
+
+        .field > label,
+        .rating-title {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #263449;
+        }
+
+        .review-input,
+        input[type="text"],
+        textarea {
+            display: block;
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #d8e0ed;
+            border-radius: 10px;
+            font: inherit;
+            background: #fff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .review-input:focus,
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        textarea {
+            min-height: 135px;
+            resize: vertical;
+        }
+
+        /* Five stars in one horizontal row */
+        .star-rating {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 5px;
+            width: fit-content;
+            min-height: 54px;
+        }
+
+        /* Hide the radio circles but keep inputs selectable */
+        .star-rating input[type="radio"] {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        .star-rating label {
+            display: inline-block !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-size: 43px;
+            line-height: 1.2;
+            color: #d7dfeb;
+            cursor: pointer;
+            transition: color 0.15s, transform 0.15s;
+        }
+
+        /* Blue selected stars */
+        .star-rating label.active {
+            color: #2878f0;
+        }
+
+        .star-rating label:hover {
+            transform: scale(1.12);
+        }
+
+        .star-rating input:focus-visible + label {
+            outline: 2px solid #2563eb;
+            outline-offset: 3px;
+            border-radius: 3px;
+        }
+
+        .rating-hint {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .error {
+            color: #dc2626;
+            font-size: 14px;
+            margin-top: 7px;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #2563eb;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .submit-button:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .review-card {
+                padding: 24px 18px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .star-rating label {
+                font-size: 38px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="review-card">
+        <div class="brand">NOVA MARKET</div>
+
+        <h1>Write a Review</h1>
+
+        <p class="subtitle">
+            Share your experience with us and help other shoppers
+            make better choices.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="error">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="field">
+                <label for="{{ form.reviewer_name.id_for_label }}">
+                    Reviewer name
+                </label>
+
+                {{ form.reviewer_name }}
+
+                {% for error in form.reviewer_name.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="field">
+                <span class="rating-title">Rating</span>
+
+                <div class="star-rating" id="starRating">
+                    {% for choice in form.rating %}
+                        {{ choice.tag }}
+                        <label
+                            for="{{ choice.id_for_label }}"
+                            title="{{ choice.choice_label }}"
+                        >★</label>
+                    {% endfor %}
+                </div>
+
+                <div class="rating-hint" id="ratingHint">
+                    Select a star rating from 1 to 5.
+                </div>
+
+                {% for error in form.rating.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="field">
+                <label for="{{ form.comment.id_for_label }}">
+                    Comment
+                </label>
+
+                {{ form.comment }}
+
+                {% for error in form.comment.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <button class="submit-button" type="submit">
+                Submit Review
+            </button>
+        </form>
+
+        <a class="back-link" href="javascript:history.back()">
+            &larr; Go Back
+        </a>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const container = document.getElementById("starRating");
+            const hint = document.getElementById("ratingHint");
+
+            if (!container || !hint) return;
+
+            const inputs = Array.from(
+                container.querySelectorAll('input[type="radio"]')
+            );
+
+            const labels = Array.from(
+                container.querySelectorAll("label")
+            );
+
+            const descriptions = {
+                1: "Poor",
+                2: "Fair",
+                3: "Good",
+                4: "Very good",
+                5: "Excellent"
+            };
+
+            function updateStars(hoverValue = 0) {
+                const selected = inputs.find(input => input.checked);
+                const selectedValue = selected
+                    ? Number(selected.value)
+                    : 0;
+
+                const displayValue = hoverValue || selectedValue;
+
+                labels.forEach(label => {
+                    const input = inputs.find(
+                        item => item.id === label.htmlFor
+                    );
+
+                    const value = input ? Number(input.value) : 0;
+
+                    label.classList.toggle(
+                        "active",
+                        value <= displayValue && displayValue > 0
+                    );
+                });
+
+                hint.textContent = displayValue
+                    ? displayValue + " out of 5 — "
+                        + descriptions[displayValue]
+                    : "Select a star rating from 1 to 5.";
+            }
+
+            inputs.forEach(input => {
+                input.addEventListener("change", function () {
+                    updateStars();
+                });
+            });
+
+            labels.forEach(label => {
+                label.addEventListener("mouseenter", function () {
+                    const input = inputs.find(
+                        item => item.id === label.htmlFor
+                    );
+
+                    if (input) {
+                        updateStars(Number(input.value));
+                    }
+                });
+            });
+
+            container.addEventListener("mouseleave", function () {
+                updateStars();
+            });
+
+            updateStars();
+        });
+    </script>
+</body>
+</html>
