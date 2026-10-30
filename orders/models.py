@@ -1,3 +1,5 @@
+
+from django.conf import settings
 from django.db import models
 
 
@@ -9,6 +11,15 @@ class Order(models.Model):
         ("delivered", "Delivered"),
         ("cancelled", "Cancelled"),
     ]
+
+    # Link each order to the customer who placed it.
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="orders",
+    )
 
     customer_name = models.CharField(max_length=150)
     email = models.EmailField()

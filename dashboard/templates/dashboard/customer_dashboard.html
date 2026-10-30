@@ -1,0 +1,943 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyShop | Customer Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #111b46;
+            --primary: #5146e5;
+            --muted: #75809c;
+            --border: #e9edfa;
+            --background: #f6f8fe;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--background);
+            color: #182344;
+        }
+
+        button, input {
+            font: inherit;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+            background: linear-gradient(180deg, #111b46, #182653);
+            color: white;
+            padding: 28px 17px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            padding: 0 12px;
+            margin-bottom: 45px;
+        }
+
+        .brand span {
+            color: #9290ff;
+        }
+
+        .nav-label {
+            color: #9ba7d0;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 0 13px;
+            margin-bottom: 12px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 14px 13px;
+            border-radius: 12px;
+            margin-bottom: 7px;
+            color: #e0e6ff;
+            font-size: 14px;
+            transition: .2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: linear-gradient(100deg, #5146e5, #665cf3);
+            color: white;
+            transform: translateX(2px);
+        }
+
+        .nav-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .nav-count {
+            margin-left: auto;
+            background: #7584ed;
+            border-radius: 20px;
+            padding: 3px 8px;
+            font-size: 11px;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding: 23px 12px 5px;
+        }
+
+        .sidebar-promo {
+            padding: 20px 14px;
+            background: #ffffff12;
+            border: 1px solid #ffffff15;
+            border-radius: 15px;
+            line-height: 1.7;
+            font-size: 13px;
+            color: #dce3ff;
+        }
+
+        .sidebar-promo strong {
+            display: block;
+            color: white;
+            font-size: 16px;
+        }
+
+        /* Main area */
+        .main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .topbar {
+            height: 78px;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            gap: 18px;
+        }
+
+        .search {
+            width: min(430px, 55%);
+            background: #f5f6fd;
+            border: 1px solid #edf0fb;
+            border-radius: 12px;
+            padding: 12px 16px;
+            outline: none;
+        }
+
+        .search:focus {
+            border-color: #8981ff;
+        }
+
+        .top-user {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #e9eaff;
+            color: var(--primary);
+            font-size: 19px;
+        }
+
+        .content {
+            max-width: 1600px;
+            margin: auto;
+            padding: 28px;
+        }
+
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 23px;
+            gap: 12px;
+        }
+
+        .page-heading h1 {
+            font-size: 25px;
+            letter-spacing: -.6px;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            margin-top: 7px;
+            font-size: 13px;
+        }
+
+        .date-pill {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 10px 13px;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #56617f;
+        }
+
+        /* Welcome banner */
+        .welcome {
+            position: relative;
+            overflow: hidden;
+            padding: 30px;
+            border-radius: 20px;
+            color: white;
+            background: linear-gradient(115deg, #4942d9, #7166f4 65%, #9388ff);
+            margin-bottom: 25px;
+        }
+
+        .welcome::after {
+            content: "🛍️";
+            position: absolute;
+            right: 8%;
+            top: 50%;
+            transform: translateY(-50%) rotate(-9deg);
+            font-size: clamp(55px, 8vw, 105px);
+            opacity: .9;
+        }
+
+        .welcome h2 {
+            font-size: clamp(22px, 3vw, 30px);
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome p {
+            color: #e5e3ff;
+            font-size: 14px;
+            line-height: 1.7;
+            max-width: 65%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-tag {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 9px 13px;
+            border-radius: 9px;
+            background: #ffffff20;
+            font-size: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Dashboard grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 290px;
+            gap: 23px;
+            align-items: start;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 19px 16px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            transition: transform .2s, box-shadow .2s;
+            min-width: 0;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px #293a6810;
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 18px;
+        }
+
+        .stat-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            display: grid;
+            place-items: center;
+            font-size: 19px;
+        }
+
+        .purple { background: #efedff; color: #6255eb; }
+        .orange { background: #fff2dc; color: #ed9b19; }
+        .green { background: #e2f8ef; color: #0ca678; }
+        .pink { background: #ffebf3; color: #ed5791; }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .stat-number {
+            font-size: 27px;
+            font-weight: 750;
+            margin-top: 5px;
+            color: #19264b;
+        }
+
+        .stat-note {
+            font-size: 10px;
+            color: #8a94aa;
+            margin-top: 9px;
+        }
+
+        /* Panels */
+        .panel {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 22px;
+        }
+
+        .panel-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .panel-header h3 {
+            font-size: 16px;
+        }
+
+        .panel-header a {
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+            text-align: left;
+        }
+
+        th {
+            background: #f7f8fd;
+            color: #79839c;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 14px 18px;
+        }
+
+        td {
+            padding: 17px 18px;
+            font-size: 12px;
+            border-bottom: 1px solid #f0f2fa;
+        }
+
+        tbody tr:hover {
+            background: #fafaff;
+        }
+
+        .order-id {
+            color: #4f46e5;
+            font-weight: 700;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 7px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 650;
+        }
+
+        .status.pending {
+            background: #fff3dd;
+            color: #bc7909;
+        }
+
+        .status.delivered {
+            background: #e1f8ed;
+            color: #07895d;
+        }
+
+        .status.cancelled {
+            background: #ffe7e7;
+            color: #c23a3a;
+        }
+
+        .view-btn {
+            display: inline-block;
+            padding: 7px 12px;
+            border: 1px solid #dedaff;
+            color: #5a4ce4;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 35px 15px;
+            color: var(--muted);
+            line-height: 1.8;
+            font-size: 13px;
+        }
+
+        /* Right column */
+        .profile {
+            padding: 22px;
+        }
+
+        .profile-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 53px;
+            height: 53px;
+            border-radius: 15px;
+            background: linear-gradient(140deg, #e7e6ff, #d7e8ff);
+            display: grid;
+            place-items: center;
+            font-size: 25px;
+        }
+
+        .profile-head h3 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .profile-head p {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .online {
+            color: #079b70;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+
+        .profile-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-top: 1px solid #eff1f8;
+            color: #626d88;
+            font-size: 12px;
+        }
+
+        .profile-link:hover {
+            color: var(--primary);
+        }
+
+        .quick-grid {
+            padding: 0 17px 18px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .quick-card {
+            text-align: center;
+            padding: 18px 8px;
+            border-radius: 12px;
+            border: 1px solid #eeedff;
+            background: #f7f6ff;
+            transition: .2s;
+            font-size: 12px;
+        }
+
+        .quick-card:hover {
+            background: #eeecff;
+            transform: translateY(-3px);
+        }
+
+        .quick-card span {
+            display: block;
+            font-size: 23px;
+            margin-bottom: 9px;
+        }
+
+        .quick-card small {
+            display: block;
+            color: #8b87d9;
+            margin-top: 8px;
+        }
+
+        .promo {
+            background: linear-gradient(140deg, #191b60, #5144d7);
+            color: white;
+            padding: 23px;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .promo h3 {
+            font-size: 19px;
+            margin-bottom: 10px;
+        }
+
+        .promo p {
+            font-size: 12px;
+            line-height: 1.7;
+            color: #e3e1ff;
+            margin-bottom: 17px;
+        }
+
+        .promo a {
+            display: inline-block;
+            background: white;
+            color: #332d9e;
+            border-radius: 9px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        footer {
+            text-align: center;
+            color: #939bb0;
+            padding: 15px 0 0;
+            font-size: 11px;
+        }
+
+        @media (max-width: 1150px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .right-column {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 18px;
+            }
+
+            .right-column > * {
+                min-width: 0;
+            }
+
+            .promo {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 850px) {
+            .sidebar {
+                width: 76px;
+                padding: 22px 10px;
+            }
+
+            .brand {
+                font-size: 22px;
+                padding: 0;
+                text-align: center;
+                margin-bottom: 35px;
+            }
+
+            .brand span,
+            .nav-label,
+            .nav-text,
+            .nav-count,
+            .sidebar-promo {
+                display: none;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 14px 5px;
+            }
+
+            .nav-icon {
+                font-size: 20px;
+            }
+
+            .sidebar-bottom {
+                padding: 0;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 560px) {
+            .topbar {
+                padding: 0 14px;
+                height: 68px;
+            }
+
+            .search {
+                width: 100%;
+                min-width: 0;
+                font-size: 12px;
+            }
+
+            .top-user .user-name {
+                display: none;
+            }
+
+            .content {
+                padding: 17px 12px;
+            }
+
+            .page-heading {
+                align-items: flex-start;
+            }
+
+            .page-heading h1 {
+                font-size: 21px;
+            }
+
+            .date-pill {
+                font-size: 10px;
+                padding: 8px;
+            }
+
+            .welcome {
+                padding: 24px 19px;
+            }
+
+            .welcome::after {
+                right: 4%;
+                font-size: 45px;
+                top: 20px;
+                transform: none;
+            }
+
+            .welcome p {
+                max-width: 82%;
+            }
+
+            .stat-card {
+                padding: 15px 12px;
+            }
+
+            .stat-number {
+                font-size: 24px;
+            }
+
+            .right-column {
+                grid-template-columns: 1fr;
+            }
+
+            .promo {
+                grid-column: auto;
+            }
+
+            .panel-header {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="brand">🛍 My<span>Shop</span></div>
+
+        <div class="nav-label">Main Menu</div>
+
+        <nav>
+            <a class="nav-link active" href="/customer-dashboard/">
+                <span class="nav-icon">⌂</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+
+            <a class="nav-link" href="/orders/">
+                <span class="nav-icon">▤</span>
+                <span class="nav-text">My Orders</span>
+            </a>
+
+            <a class="nav-link" href="/wishlist/">
+                <span class="nav-icon">♡</span>
+                <span class="nav-text">My Wishlist</span>
+            </a>
+
+            <a class="nav-link" href="/accounts/profile/">
+                <span class="nav-icon">⌖</span>
+                <span class="nav-text">My Addresses</span>
+            </a>
+
+            <a class="nav-link" href="/accounts/profile/">
+                <span class="nav-icon">⚙</span>
+                <span class="nav-text">Account Settings</span>
+            </a>
+
+            <a class="nav-link" href="/accounts/logout/">
+                <span class="nav-icon">⇥</span>
+                <span class="nav-text">Logout</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-promo">
+                ✨ Shop with confidence
+                <strong>Better Products.</strong>
+                Brighter Future.
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <input class="search" type="search"
+                   placeholder="⌕  Search for products...">
+
+            <div class="top-user">
+                <span style="font-size:20px">♧</span>
+                <div class="avatar">👤</div>
+                <span class="user-name">{{ request.user.username }}</span>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="page-heading">
+                <div>
+                    <h1>Customer Dashboard</h1>
+                    <p>Welcome back! Here's your shopping overview.</p>
+                </div>
+                <div class="date-pill">✦ My Account</div>
+            </div>
+
+            <section class="welcome">
+                <h2>Hello, {{ request.user.username }}! 👋</h2>
+                <p>
+                    We're happy to have you here. Explore products,
+                    manage your orders, and enjoy your shopping experience.
+                </p>
+                <span class="welcome-tag">
+                    ✨ Your shopping journey starts here
+                </span>
+            </section>
+
+            <div class="dashboard-grid">
+                <section class="left-column">
+
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-top">
+                                <span class="stat-icon purple">🛍</span>
+                            </div>
+                            <div class="stat-label">Total Orders</div>
+                            <div class="stat-number">{{ total_orders }}</div>
+                            <div class="stat-note">Your order history</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-top">
+                                <span class="stat-icon orange">◷</span>
+                            </div>
+                            <div class="stat-label">Pending Orders</div>
+                            <div class="stat-number">{{ pending_orders }}</div>
+                            <div class="stat-note">Awaiting completion</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-top">
+                                <span class="stat-icon green">✓</span>
+                            </div>
+                            <div class="stat-label">Completed Orders</div>
+                            <div class="stat-number">{{ completed_orders }}</div>
+                            <div class="stat-note">Successfully completed</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-top">
+                                <span class="stat-icon pink">♡</span>
+                            </div>
+                            <div class="stat-label">Wishlist Items</div>
+                            <div class="stat-number">{{ wishlist_count }}</div>
+                            <div class="stat-note">Products you love</div>
+                        </div>
+                    </div>
+
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h3>📦 Recent Orders</h3>
+                            <a href="/orders/">View All →</a>
+                        </div>
+
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                {% for order in recent_orders %}
+                                    <tr>
+                                        <td class="order-id">
+                                            #{{ order.id }}
+                                        </td>
+                                        <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                        <td>Rs. {{ order.total_amount }}</td>
+                                        <td>
+                                            <span class="status
+                                                {% if order.status == 'Delivered' or order.status == 'delivered' %}delivered
+                                                {% elif order.status == 'Cancelled' or order.status == 'cancelled' %}cancelled
+                                                {% else %}pending{% endif %}">
+                                                {{ order.status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a class="view-btn" href="/orders/">
+                                                View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="empty">
+                                            <div style="font-size:30px">🛍️</div>
+                                            <strong>No orders yet</strong>
+                                            <br>
+                                            Your recent orders will appear here.
+                                            <br><br>
+                                            <a href="/" style="color:#5146e5">
+                                                Start Shopping →
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </section>
+
+                <aside class="right-column">
+                    <section class="panel profile">
+                        <div class="profile-head">
+                            <div class="profile-avatar">👤</div>
+                            <div>
+                                <h3>{{ request.user.username }}</h3>
+                                <p>{{ request.user.email|default:"MyShop Customer" }}</p>
+                                <div class="online">● Account active</div>
+                            </div>
+                        </div>
+
+                        <a class="profile-link" href="/accounts/profile/">
+                            Edit Profile <span>›</span>
+                        </a>
+                        <a class="profile-link" href="/accounts/password_change/">
+                            Change Password <span>›</span>
+                        </a>
+                        <a class="profile-link" href="/accounts/profile/">
+                            My Addresses <span>›</span>
+                        </a>
+                    </section>
+
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h3>⚡ Quick Links</h3>
+                        </div>
+
+                        <div class="quick-grid">
+                            <a class="quick-card" href="/orders/">
+                                <span>▤</span>
+                                My Orders
+                                <small>View →</small>
+                            </a>
+
+                            <a class="quick-card" href="/wishlist/">
+                                <span>♡</span>
+                                My Wishlist
+                                <small>Explore →</small>
+                            </a>
+
+                            <a class="quick-card" href="/cart/">
+                                <span>🛒</span>
+                                My Cart
+                                <small>Open →</small>
+                            </a>
+
+                            <a class="quick-card" href="/">
+                                <span>⌕</span>
+                                Shop Products
+                                <small>Browse →</small>
+                            </a>
+                        </div>
+                    </section>
+
+                    <section class="promo">
+                        <h3>Discover More ✨</h3>
+                        <p>
+                            Find your next favorite product.
+                            Browse our collection and discover something special.
+                        </p>
+                        <a href="/">Shop Now →</a>
+                    </section>
+                </aside>
+            </div>
+
+            <footer>
+                © {% now "Y" %} MyShop. Made for a better shopping experience.
+            </footer>
+        </div>
+    </main>
+</div>
+</body>
+</html>

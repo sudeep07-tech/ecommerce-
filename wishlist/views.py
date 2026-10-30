@@ -1,4 +1,7 @@
+
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
-# Wishlist views are added starting from the phase that implements this
-# app's user-facing or dashboard functionality.
+@login_required
+def wishlist_view(request):
+    return render(request, "wishlist/wishlist.html")

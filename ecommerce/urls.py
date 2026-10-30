@@ -3,6 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from dashboard.views import customer_dashboard
 
 urlpatterns = [
     # Django admin
@@ -10,6 +11,13 @@ urlpatterns = [
 
     # User accounts: Login, Register, and Logout
     path("accounts/", include("accounts.urls")),
+
+    # Customer dashboard
+    path(
+        "customer-dashboard/",
+        customer_dashboard,
+        name="customer_dashboard",
+    ),
 
     # Homepage, product listing, and search
     path("", include("products.urls")),

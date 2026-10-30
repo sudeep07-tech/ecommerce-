@@ -2,6 +2,7 @@
 from decimal import Decimal
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
@@ -118,10 +119,32 @@ def _checkout_totals(subtotal, payment_method="khalti"):
 
 
 # ==========================================
+# MY ORDERS
+# ==========================================
+@login_required
+def my_orders(request):
+    if admin_cannot_shop(request):
+        return redirect("products:list")
+
+    orders = (
+        Order.objects
+        .filter(user=request.user)
+        .prefetch_related("items")
+        .order_by("-created_at")
+    )
+
+    return render(
+        request,
+        "orders/my_orders.html",
+        {"orders": orders},
+    )
+
+
+# ==========================================
 # CHECKOUT: CUSTOMER AND DELIVERY DETAILS
 # ==========================================
+@login_required
 def checkout(request):
-    # Never allow staff/admin accounts to proceed to checkout.
     if admin_cannot_shop(request):
         return redirect("cart:detail")
 
@@ -177,8 +200,8 @@ def checkout(request):
 # ==========================================
 # PAYMENT METHOD: COD OR KHALTI DEMO
 # ==========================================
+@login_required
 def payment_method(request):
-    # Also protect the payment URL if an admin opens it directly.
     if admin_cannot_shop(request):
         return redirect("cart:detail")
 
@@ -244,7 +267,7 @@ def payment_method(request):
             context,
         )
 
-    # Khalti is currently demo-only; no payment is processed.
+    # Khalti is demo-only; no payment is processed.
     if selected_method == "khalti":
         messages.warning(
             request,
@@ -304,6 +327,7 @@ def payment_method(request):
             )
 
             order = Order.objects.create(
+                user=request.user,
                 customer_name=customer_details["customer_name"],
                 email=customer_details["email"],
                 phone=customer_details["phone"],
@@ -312,7 +336,6 @@ def payment_method(request):
                 postal_code=customer_details["postal_code"],
                 status="pending",
                 total_amount=final_total,
-                khalti_pidx=None,
             )
 
             for item in verified_items:
@@ -365,10 +388,12 @@ def payment_method(request):
 # ==========================================
 # ORDER SUCCESS
 # ==========================================
+@login_required
 def order_success(request, order_id):
     order = get_object_or_404(
         Order.objects.prefetch_related("items"),
         pk=order_id,
+        user=request.user,
     )
 
     subtotal = sum(
@@ -402,7 +427,6 @@ def track_order(request):
         order_number = request.POST.get(
             "order_number", ""
         ).strip()
-
         email = request.POST.get("email", "").strip()
 
         if not order_number or not email:
